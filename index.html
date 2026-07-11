@@ -219,7 +219,7 @@
   td.method-key { display: flex; align-items: center; gap: 8px; }
   td .k { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
   tbody tr { transition: background .15s ease; }
-  tbody tr:hover { background: color-mix(in srgb, var(--surface-1) 92%, var(--series-sitf)); }
+  tbody tr:hover, tbody tr.row-highlight { background: color-mix(in srgb, var(--surface-1) 92%, var(--series-sitf)); }
   tbody tr:last-child td { border-bottom: none; }
   .table-scroll { overflow-x: auto; }
 
@@ -771,8 +771,12 @@
         svg.appendChild(rect);
         rect.addEventListener("pointermove", function (evt) {
           showTooltip(evt, [{ text: g.label }, { text: s.name + ": " + (decimals ? v.toFixed(decimals) : Math.round(v)) + unit, colorVar: s.colorVar }]);
+          highlightRows(s.name, g.label, true);
         });
-        rect.addEventListener("pointerleave", hideTooltip);
+        rect.addEventListener("pointerleave", function () {
+          hideTooltip();
+          highlightRows(s.name, g.label, false);
+        });
         rect.addEventListener("click", function () { onPick && onPick(g.label); });
       });
       var xl = el("text", {
@@ -890,6 +894,14 @@
   updatePinReadout();
 
   /* ================= sortable table (accessible alternative) ================= */
+  function highlightRows(method, windowLabel, on) {
+    document.querySelectorAll("tr[data-method]").forEach(function (tr) {
+      if (tr.dataset.method === method && tr.dataset.window === windowLabel) {
+        tr.classList.toggle("row-highlight", on);
+      }
+    });
+  }
+
   function renderCompareTable(sortKey, sortDir) {
     var rows = compareData.slice();
     if (sortKey) {
@@ -905,6 +917,8 @@
     clear(tbody);
     rows.forEach(function (d) {
       var tr = document.createElement("tr");
+      tr.dataset.method = d.method;
+      tr.dataset.window = d.window;
       var cells = [d.method, d.window, d.precision.toFixed(2) + "%", d.pod.toFixed(2) + "%", d.f1.toFixed(3), d.far.toFixed(2) + "%"];
       cells.forEach(function (val, ci) {
         var td = document.createElement("td");
