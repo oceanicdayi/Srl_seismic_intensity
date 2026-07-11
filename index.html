@@ -123,6 +123,7 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; max-width: 1080px; }
+<<<<<<< HEAD
   .brand { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; color: var(--text-primary); text-decoration: none; }
   .topnav { display: flex; gap: 20px; align-items: center; }
   .topnav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; position: relative; padding-bottom: 2px; }
@@ -130,14 +131,24 @@
   .topnav a.active { color: var(--text-primary); }
   .topnav a.active::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
+=======
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; color: var(--text-primary); text-decoration: none; flex: none; }
+  .topnav { display: flex; gap: 20px; align-items: center; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .topnav::-webkit-scrollbar { display: none; }
+  .topnav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; flex: none; position: relative; padding: 4px 0; }
+  .topnav a:hover { color: var(--text-primary); }
+  .topnav a.active { color: var(--text-primary); font-weight: 600; }
+  .topnav a.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px;
+>>>>>>> origin/main
     background: var(--series-sitf); border-radius: 2px;
   }
   #theme-toggle {
     border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
-    border-radius: 999px; width: 32px; height: 32px; cursor: pointer; font-size: 15px;
-    display: flex; align-items: center; justify-content: center;
+    border-radius: 999px; width: 32px; height: 32px; cursor: pointer; font-size: 15px; flex: none;
+    display: flex; align-items: center; justify-content: center; transition: transform .3s ease;
   }
-  #theme-toggle:hover { color: var(--text-primary); }
+  #theme-toggle:hover { color: var(--text-primary); transform: rotate(15deg); }
 
   /* ---------- hero ---------- */
   .hero { padding: 64px 0 40px; }
@@ -147,7 +158,8 @@
     color: var(--text-secondary); border: 1px solid var(--border); border-radius: 999px;
     padding: 5px 12px; margin-bottom: 20px;
   }
-  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--series-sitf); }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--series-sitf); animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
   h1 { font-size: clamp(28px, 4vw, 42px); line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.01em; }
   .subtitle { font-size: clamp(16px, 2vw, 19px); color: var(--text-secondary); max-width: 700px; margin: 0 0 28px; }
   .authors { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
@@ -160,7 +172,7 @@
   }
 
   /* ---------- generic section / card ---------- */
-  section { padding: 40px 0; }
+  section { padding: 40px 0; scroll-margin-top: 68px; }
   section.divider { border-top: 1px solid var(--border); }
   .section-head { margin-bottom: 24px; }
   .kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--series-sitf); margin-bottom: 8px; }
@@ -180,15 +192,24 @@
     box-shadow: var(--card-shadow); padding: 24px;
   }
 
+  /* ---------- scroll reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal, .limits li { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+
   /* ---------- abstract ---------- */
   .abstract p { color: var(--text-secondary); font-size: 15px; margin: 0; }
   .abstract .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
 
   /* ---------- stat tiles ---------- */
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-  .tile { background: var(--surface-1); padding: 22px 20px; }
+  .tile { background: var(--surface-1); padding: 22px 20px; transition: background .2s ease; }
+  .tile:hover { background: color-mix(in srgb, var(--surface-1) 88%, var(--series-sitf)); }
   .tile .t-label { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 10px; }
-  .tile .t-value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; }
+  .tile .t-value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
   .tile .t-delta { font-size: 12.5px; margin-top: 8px; color: var(--text-muted); }
   .tile .t-delta.good { color: var(--good); }
   .tile .t-value .unit { font-size: 16px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
@@ -204,15 +225,33 @@
   .axis-label, .cat-label { fill: var(--text-muted); font-size: 10.5px; font-family: system-ui, sans-serif; }
   .gridline { stroke: var(--gridline); stroke-width: 1; }
   .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .crosshair { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; transition: opacity .1s ease; }
+  .win-band { fill: var(--series-sitf); fill-opacity: 0.08; }
   .value-label { fill: var(--text-secondary); font-size: 10px; font-weight: 600; font-family: system-ui, sans-serif; }
-  .legend-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12.5px; color: var(--text-secondary); }
-  .legend-row .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12.5px; }
+  .legend-row .key {
+    display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border);
+    background: transparent; border-radius: 999px; padding: 5px 11px; font: inherit; color: var(--text-secondary);
+    cursor: pointer; transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .legend-row .key:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  .legend-row .key[aria-pressed="false"] { opacity: .4; }
   .legend-row .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
   .legend-row .swatch.line { width: 14px; height: 2px; border-radius: 1px; }
   #method-legend .key { cursor: pointer; user-select: none; padding: 3px 8px 3px 4px; border-radius: 999px; border: 1px solid transparent; transition: opacity .15s ease, border-color .15s ease, background .15s ease; }
   #method-legend .key:hover { border-color: var(--border); background: var(--page); }
   #method-legend .key.inactive { opacity: 0.35; }
   #method-legend .key:focus-visible { outline: 2px solid var(--series-sitf); outline-offset: 2px; }
+
+  /* ---------- metric segmented control ---------- */
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .seg button {
+    font: inherit; font-size: 12.5px; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--page); color: var(--text-secondary);
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .seg button:hover { color: var(--text-primary); }
+  .seg button[aria-pressed="true"] { background: var(--series-sitf); border-color: var(--series-sitf); color: #fff; }
 
   /* hoverable marks */
   .bar-mark, .dot-mark { cursor: pointer; transition: opacity .12s ease, fill-opacity .15s ease; }
@@ -233,28 +272,39 @@
   #tooltip.show { opacity: 1; }
   #tooltip .tt-title { font-weight: 600; margin-bottom: 2px; }
   #tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
-  #tooltip .tt-key { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+  #tooltip .tt-key { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex: none; }
 
   /* ---------- table ---------- */
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   th, td { text-align: right; padding: 10px 12px; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; }
   th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; font-variant-numeric: normal; }
-  th { color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  th { color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; user-select: none; }
+  table.sortable th { cursor: pointer; }
+  table.sortable th:hover { color: var(--text-primary); }
+  th .sort-arrow { color: var(--series-sitf); }
   td.method-key { display: flex; align-items: center; gap: 8px; }
   td .k { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+  tbody tr { transition: background .15s ease; }
+  tbody tr:hover { background: color-mix(in srgb, var(--surface-1) 92%, var(--series-sitf)); }
   tbody tr:last-child td { border-bottom: none; }
   .table-scroll { overflow-x: auto; }
 
   /* ---------- pathway cards ---------- */
+<<<<<<< HEAD
   .pathway { border-top: 3px solid var(--card-accent, var(--series-sitf)); transition: transform .18s ease, box-shadow .18s ease; }
   .pathway:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(11,11,11,0.07), 0 14px 32px rgba(11,11,11,0.08); }
+=======
+  .pathway { border-top: 3px solid var(--card-accent, var(--series-sitf)); transition: transform .2s ease, box-shadow .2s ease; }
+  .pathway:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(11,11,11,0.06), 0 14px 28px rgba(11,11,11,0.08); }
+>>>>>>> origin/main
   .pathway .p-eyebrow { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--card-accent, var(--series-sitf)); margin-bottom: 8px; }
   .pathway h3 { font-size: 17px; margin: 0 0 8px; }
   .pathway p { font-size: 13.5px; color: var(--text-secondary); margin: 0; }
 
   /* ---------- limitations ---------- */
   .limits { padding-left: 0; margin: 0; list-style: none; display: grid; gap: 12px; }
-  .limits li { display: flex; gap: 12px; font-size: 14px; color: var(--text-secondary); }
+  .limits li { display: flex; gap: 12px; font-size: 14px; color: var(--text-secondary); opacity: 0; transform: translateX(-10px); transition: opacity .45s ease, transform .45s ease; }
+  .limits li.in-view { opacity: 1; transform: none; }
   .limits .n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--surface-1); border: 1px solid var(--border); color: var(--text-muted); font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
   /* ---------- arch spec ---------- */
@@ -267,6 +317,18 @@
   footer .foot-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--text-muted); }
   footer a { color: var(--text-secondary); text-decoration: none; }
   footer a:hover { color: var(--text-primary); }
+
+  /* ---------- back to top ---------- */
+  #back-to-top {
+    position: fixed; right: 20px; bottom: 20px; z-index: 30;
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface-1); color: var(--text-secondary); box-shadow: var(--card-shadow);
+    cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transform: translateY(8px);
+    transition: opacity .2s ease, transform .2s ease, color .2s ease;
+  }
+  #back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  #back-to-top:hover { color: var(--text-primary); }
 </style>
 </head>
 <body>
@@ -278,7 +340,9 @@
     <a class="brand" href="#top">SITF · Second-by-Second Intensity Forecaster</a>
     <div class="topnav">
       <a href="#results">Results</a>
+      <a href="#threshold">Threshold</a>
       <a href="#compare">Comparison</a>
+      <a href="#ebear">eBEAR</a>
       <a href="#method">Method</a>
       <a href="#limitations">Limitations</a>
       <a href="https://github.com/oceanicdayi/Srl_seismic_intensity" target="_blank" rel="noopener">Manuscript</a>
@@ -399,19 +463,16 @@
       <div class="kicker">National public-warning threshold, I ≥ 4</div>
       <h2><a class="anchor-link" href="#threshold" aria-label="Link to this section">#</a>A non-monotonic path to a high-precision regime</h2>
       <p class="lede">Threshold discrimination is strongly window-dependent: precision dips near EW15 before recovering
-        sharply by EW20 and stabilizing above 96% by EW30–EW40, while the false-alarm rate mirrors the same trough.</p>
+        sharply by EW20 and stabilizing above 96% by EW30–EW40, while the false-alarm rate mirrors the same trough.
+        Hover the chart to compare both curves at any window.</p>
     </div>
-    <div class="grid-2">
-      <div class="card chart-card">
-        <h3>SITF precision at I ≥ 4</h3>
-        <div class="chart-sub">EW15 → EW40, percent of positive calls that were correct</div>
-        <svg class="chart" id="chart-precision-trend" viewBox="0 0 420 220" role="img" aria-label="Precision rises from 51.2% at EW15 to 96.4% at EW40"></svg>
+    <div class="card chart-card">
+      <div class="legend-row">
+        <span class="key" aria-pressed="true" style="cursor:default;"><span class="swatch line" style="background:var(--series-sitf)"></span>Precision (left axis)</span>
+        <span class="key" aria-pressed="true" style="cursor:default;"><span class="swatch line" style="background:var(--series-plum)"></span>False-alarm rate (right axis)</span>
       </div>
-      <div class="card chart-card">
-        <h3>SITF false-alarm rate at I ≥ 4</h3>
-        <div class="chart-sub">EW15 → EW40, percent of negatives incorrectly flagged</div>
-        <svg class="chart" id="chart-far-trend" viewBox="0 0 420 220" role="img" aria-label="False-alarm rate falls from 2.15% at EW15 to under 0.4% by EW20 and beyond"></svg>
-      </div>
+      <div class="chart-sub">EW15 → EW40, precision of positive calls vs. false-alarm rate on negatives</div>
+      <svg class="chart" id="chart-threshold-dual" viewBox="0 0 720 260" role="img" aria-label="Dual-axis chart: precision rises from 51.2% at EW15 to 96.4% at EW40 while false-alarm rate falls from 2.15% to under 0.4% by EW20 and beyond"></svg>
     </div>
   </div>
 </section>
@@ -422,8 +483,9 @@
       <div class="kicker">Comparison with direct-observation baselines</div>
       <h2><a class="anchor-link" href="#compare" aria-label="Link to this section">#</a>Different methods, different operating points</h2>
       <p class="lede">SITF sits between conservative target-station persistence and an aggressive propagation-only
-        PLUM-like baseline — it detects more than persistence while keeping false alarms far below PLUM.</p>
+        PLUM-like baseline. Switch metrics, click a method chip to isolate it, or click a bar to pin a side-by-side readout.</p>
     </div>
+<<<<<<< HEAD
     <div class="legend-row" id="method-legend">
       <span class="key" data-series="SITF" role="button" tabindex="0" aria-pressed="true"><span class="swatch" style="background:var(--series-sitf)"></span>SITF</span>
       <span class="key" data-series="Persistence-cummax" role="button" tabindex="0" aria-pressed="true"><span class="swatch" style="background:var(--series-persistence)"></span>Persistence-cummax</span>
@@ -440,17 +502,37 @@
         <h3>Detection (POD) at I ≥ 4</h3>
         <div class="chart-sub">by early window, three methods</div>
         <svg class="chart" id="chart-pod-method" viewBox="0 0 460 260" role="img" aria-label="Grouped bar chart of probability of detection by method across EW20, EW30 and EW40"></svg>
+=======
+    <div class="card chart-card">
+      <div class="seg" id="metric-switch" role="tablist" aria-label="Metric to display">
+        <button type="button" data-metric="precision" aria-pressed="true">Precision</button>
+        <button type="button" data-metric="pod" aria-pressed="false">POD / Recall</button>
+        <button type="button" data-metric="f1" aria-pressed="false">F1</button>
+        <button type="button" data-metric="far" aria-pressed="false">FAR</button>
+>>>>>>> origin/main
       </div>
+      <div class="legend-row" id="method-legend"></div>
+      <h3 id="chart-compare-title">Precision at I ≥ 4</h3>
+      <div class="chart-sub" id="chart-compare-sub">by early window, three methods — click a bar or window label to pin a readout</div>
+      <svg class="chart" id="chart-compare" viewBox="0 0 620 280" role="img" aria-label="Grouped bar chart comparing SITF, persistence, and PLUM-R30 across EW20, EW30 and EW40"></svg>
+      <p class="chart-sub" id="pin-readout" style="margin-top:14px; margin-bottom:0;"></p>
     </div>
 
     <div class="card" style="margin-top:20px;">
       <div class="table-scroll">
-        <table>
+        <table class="sortable" id="compare-table">
           <caption style="caption-side:top; text-align:left; font-size:12.5px; color:var(--text-muted); margin-bottom:10px;">
-            Table view — full source data for the charts above (Table 2 of the manuscript)
+            Table view — full source data for the chart above (Table 2 of the manuscript). Click a column heading to sort.
           </caption>
           <thead>
-            <tr><th>Method</th><th>Window</th><th>Precision</th><th>POD / Recall</th><th>F1</th><th>FAR</th></tr>
+            <tr>
+              <th data-key="method">Method</th>
+              <th data-key="window">Window</th>
+              <th data-key="precision">Precision</th>
+              <th data-key="pod">POD / Recall</th>
+              <th data-key="f1">F1</th>
+              <th data-key="far">FAR</th>
+            </tr>
           </thead>
           <tbody id="table-body"></tbody>
         </table>
@@ -579,12 +661,17 @@
 </footer>
 
 <div id="tooltip" role="status" aria-live="polite"></div>
+<<<<<<< HEAD
 <div id="toast" role="status" aria-live="polite"></div>
+=======
+>>>>>>> origin/main
 <button id="back-to-top" aria-label="Back to top" title="Back to top">↑</button>
 
 <script>
 (function () {
   "use strict";
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------------- theme toggle ---------------- */
   var root = document.documentElement;
@@ -597,6 +684,8 @@
     root.setAttribute("data-theme", next);
     localStorage.setItem("sitf-theme", next);
   });
+  // Chart colors below are set via CSS var() in inline styles, so they
+  // recolor live on theme toggle without any chart re-render.
 
   var SVGNS = "http://www.w3.org/2000/svg";
   function el(tag, attrs) {
@@ -604,9 +693,7 @@
     for (var k in attrs) e.setAttribute(k, attrs[k]);
     return e;
   }
-  function cssVar(name) {
-    return getComputedStyle(document.body).getPropertyValue(name).trim();
-  }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
   var tooltip = document.getElementById("tooltip");
   function showTooltip(evt, rows) {
@@ -616,9 +703,9 @@
       if (i === 0) { row.className = "tt-title"; row.textContent = r.text; }
       else {
         row.className = "tt-row";
-        if (r.color) {
+        if (r.colorVar) {
           var key = document.createElement("span");
-          key.className = "tt-key"; key.style.background = r.color;
+          key.className = "tt-key"; key.style.background = "var(" + r.colorVar + ")";
           row.appendChild(key);
         }
         var span = document.createElement("span");
@@ -633,86 +720,90 @@
   }
   function hideTooltip() { tooltip.classList.remove("show"); }
 
-  /* ================= line trend charts ================= */
-  function renderLineChart(svgId, points, opts) {
+  /* ================= dual-axis threshold chart ================= */
+  function renderDualAxisChart(svgId, points, optsA, optsB) {
     var svg = document.getElementById(svgId);
-    var W = 420, H = 220, padL = 34, padR = 16, padT = 16, padB = 30;
+    clear(svg);
+    var W = 720, H = 260, padL = 40, padR = 44, padT = 20, padB = 34;
     var plotW = W - padL - padR, plotH = H - padT - padB;
-    var yMax = opts.yMax, yTicks = opts.yTicks, unit = opts.unit || "%";
-    var color = cssVar(opts.colorVar);
 
     function xAt(i) { return padL + (i / (points.length - 1)) * plotW; }
-    function yAt(v) { return padT + plotH - (v / yMax) * plotH; }
+    function yAtA(v) { return padT + plotH - (v / optsA.yMax) * plotH; }
+    function yAtB(v) { return padT + plotH - (v / optsB.yMax) * plotH; }
 
-    // gridlines + y labels
-    yTicks.forEach(function (t) {
-      var y = yAt(t);
+    optsA.yTicks.forEach(function (t) {
+      var y = yAtA(t);
       svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y, y2: y, class: "gridline" }));
-      var label = el("text", { x: padL - 8, y: y + 3, class: "axis-label", "text-anchor": "end" });
-      label.textContent = t;
-      svg.appendChild(label);
+      var lab = el("text", { x: padL - 8, y: y + 3, class: "axis-label", "text-anchor": "end", style: "fill:var(--series-sitf)" });
+      lab.textContent = t;
+      svg.appendChild(lab);
     });
-    // baseline
-    svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: yAt(0), y2: yAt(0), class: "baseline" }));
+    optsB.yTicks.forEach(function (t) {
+      var y = yAtB(t);
+      var lab = el("text", { x: W - padR + 8, y: y + 3, class: "axis-label", "text-anchor": "start", style: "fill:var(--series-plum)" });
+      lab.textContent = t;
+      svg.appendChild(lab);
+    });
+    svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: yAtA(0), y2: yAtA(0), class: "baseline" }));
 
-    // area wash
-    var areaPts = points.map(function (p, i) { return xAt(i) + "," + yAt(p.v); }).join(" ");
-    var areaPath = "M" + xAt(0) + "," + yAt(0) + " L" + areaPts + " L" + xAt(points.length - 1) + "," + yAt(0) + " Z";
-    svg.appendChild(el("path", { d: areaPath, fill: color, "fill-opacity": "0.10", stroke: "none" }));
+    var areaPts = points.map(function (p, i) { return xAt(i) + "," + yAtA(p.a); }).join(" ");
+    var areaPath = "M" + xAt(0) + "," + yAtA(0) + " L" + areaPts + " L" + xAt(points.length - 1) + "," + yAtA(0) + " Z";
+    svg.appendChild(el("path", { d: areaPath, style: "fill:var(--series-sitf); fill-opacity:0.08; stroke:none;" }));
 
-    // line
-    var linePts = points.map(function (p, i) { return xAt(i) + "," + yAt(p.v); }).join(" ");
-    svg.appendChild(el("polyline", { points: linePts, fill: "none", stroke: color, "stroke-width": "2", "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    var lineA = points.map(function (p, i) { return xAt(i) + "," + yAtA(p.a); }).join(" ");
+    var lineB = points.map(function (p, i) { return xAt(i) + "," + yAtB(p.b); }).join(" ");
+    svg.appendChild(el("polyline", { points: lineA, style: "fill:none; stroke:var(--series-sitf); stroke-width:2;", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    svg.appendChild(el("polyline", { points: lineB, style: "fill:none; stroke:var(--series-plum); stroke-width:2; stroke-dasharray:5 4;", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+    var crosshair = el("line", { x1: xAt(0), x2: xAt(0), y1: padT, y2: padT + plotH, class: "crosshair", style: "opacity:0;" });
+    svg.appendChild(crosshair);
 
     points.forEach(function (p, i) {
-      var cx = xAt(i), cy = yAt(p.v);
-      // surface ring
-      svg.appendChild(el("circle", { cx: cx, cy: cy, r: 6, fill: cssVar("--surface-1") }));
-      var dot = el("circle", { cx: cx, cy: cy, r: 4.5, fill: color, class: "dot-mark" });
-      svg.appendChild(dot);
-      // transparent larger hit target
-      var hit = el("circle", { cx: cx, cy: cy, r: 14, fill: "transparent", class: "dot-mark" });
-      hit.addEventListener("pointermove", function (evt) {
-        showTooltip(evt, [{ text: p.label }, { text: p.v + unit, color: color }]);
-      });
-      hit.addEventListener("pointerleave", hideTooltip);
-      svg.appendChild(hit);
+      var cx = xAt(i), cyA = yAtA(p.a), cyB = yAtB(p.b);
+      svg.appendChild(el("circle", { cx: cx, cy: cyA, r: 6, style: "fill:var(--surface-1);" }));
+      svg.appendChild(el("circle", { cx: cx, cy: cyA, r: 4.5, style: "fill:var(--series-sitf);" }));
+      svg.appendChild(el("circle", { cx: cx, cy: cyB, r: 5, style: "fill:var(--surface-1);" }));
+      svg.appendChild(el("circle", { cx: cx, cy: cyB, r: 3.5, style: "fill:var(--series-plum);" }));
 
-      // x label
       var xl = el("text", { x: cx, y: H - 8, class: "axis-label", "text-anchor": "middle" });
       xl.textContent = p.label;
       svg.appendChild(xl);
+    });
 
-      // endpoint value label
-      if (opts.labelEnds && (i === 0 || i === points.length - 1)) {
-        var vl = el("text", { x: cx, y: cy - 12, class: "value-label", "text-anchor": "middle" });
-        vl.textContent = p.v + unit;
-        svg.appendChild(vl);
-      }
+    var sliceW = plotW / points.length;
+    points.forEach(function (p, i) {
+      var hit = el("rect", { x: padL + i * sliceW, y: padT, width: sliceW, height: plotH, fill: "transparent", style: "cursor:pointer;" });
+      svg.appendChild(hit);
+      hit.addEventListener("pointermove", function (evt) {
+        crosshair.setAttribute("x1", xAt(i));
+        crosshair.setAttribute("x2", xAt(i));
+        crosshair.style.opacity = "1";
+        showTooltip(evt, [
+          { text: p.label },
+          { text: "Precision: " + p.a.toFixed(2) + "%", colorVar: "--series-sitf" },
+          { text: "FAR: " + p.b.toFixed(2) + "%", colorVar: "--series-plum" }
+        ]);
+      });
+      hit.addEventListener("pointerleave", function () { crosshair.style.opacity = "0"; hideTooltip(); });
     });
   }
 
-  renderLineChart("chart-precision-trend", [
-    { label: "EW15", v: 51.2 },
-    { label: "EW20", v: 91.5 },
-    { label: "EW30", v: 96.15 },
-    { label: "EW40", v: 96.39 }
-  ], { yMax: 100, yTicks: [0, 25, 50, 75, 100], colorVar: "--series-sitf", labelEnds: true });
+  renderDualAxisChart("chart-threshold-dual", [
+    { label: "EW15", a: 51.2, b: 2.15 },
+    { label: "EW20", a: 91.5, b: 0.38 },
+    { label: "EW30", a: 96.15, b: 0.20 },
+    { label: "EW40", a: 96.39, b: 0.26 }
+  ], { yMax: 100, yTicks: [0, 25, 50, 75, 100] }, { yMax: 2.5, yTicks: [0, 1.25, 2.5] });
 
-  renderLineChart("chart-far-trend", [
-    { label: "EW15", v: 2.15 },
-    { label: "EW20", v: 0.38 },
-    { label: "EW30", v: 0.20 },
-    { label: "EW40", v: 0.26 }
-  ], { yMax: 2.5, yTicks: [0, 1.25, 2.5], colorVar: "--series-plum", labelEnds: true });
-
-  /* ================= grouped bar charts ================= */
-  function renderGroupedBar(svgId, groups, series, yMax, unit) {
+  /* ================= comparison chart (metric-switchable, filterable) ================= */
+  function renderGroupedBar(svgId, groups, series, yMax, decimals, unit, pinnedLabel, onPick) {
     var svg = document.getElementById(svgId);
-    var W = 460, H = 260, padL = 30, padR = 10, padT = 16, padB = 32;
+    clear(svg);
+    var W = 620, H = 280, padL = 34, padR = 12, padT = 16, padB = 36;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var groupW = plotW / groups.length;
-    var barW = 20, gap = 3;
+    var barW = series.length === 1 ? 44 : series.length === 2 ? 30 : 20;
+    var gap = 4;
     var seriesTotalW = series.length * barW + (series.length - 1) * gap;
     var yTicks = [0, yMax / 2, yMax];
 
@@ -720,7 +811,7 @@
       var y = padT + plotH - (t / yMax) * plotH;
       svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y, y2: y, class: "gridline" }));
       var label = el("text", { x: padL - 6, y: y + 3, class: "axis-label", "text-anchor": "end" });
-      label.textContent = Math.round(t);
+      label.textContent = decimals ? t.toFixed(decimals) : Math.round(t);
       svg.appendChild(label);
     });
     var y0 = padT + plotH;
@@ -728,12 +819,16 @@
 
     groups.forEach(function (g, gi) {
       var groupLeft = padL + gi * groupW;
+      if (pinnedLabel && g.label === pinnedLabel) {
+        svg.appendChild(el("rect", { x: groupLeft, y: padT, width: groupW, height: plotH, class: "win-band" }));
+      }
       var startX = groupLeft + (groupW - seriesTotalW) / 2;
       series.forEach(function (s, si) {
         var v = g.values[si];
         var barH = (v / yMax) * plotH;
         var x = startX + si * (barW + gap);
         var y = y0 - barH;
+<<<<<<< HEAD
         var rect = el("rect", { x: x, y: y, width: barW, height: Math.max(barH, 1.5), rx: 3, ry: 3, fill: s.color, class: "bar-mark", "data-series": s.name, "data-window": g.label });
         svg.appendChild(rect);
         rect.addEventListener("pointermove", function (evt) {
@@ -744,48 +839,33 @@
           hideTooltip();
           highlightRows(s.name, g.label, false);
         });
+=======
+        var rect = el("rect", { x: x, y: y, width: barW, height: Math.max(barH, 1.5), rx: 3, ry: 3, class: "bar-mark", style: "fill:var(" + s.colorVar + ")" });
+        svg.appendChild(rect);
+        rect.addEventListener("pointermove", function (evt) {
+          showTooltip(evt, [{ text: g.label }, { text: s.name + ": " + (decimals ? v.toFixed(decimals) : Math.round(v)) + unit, colorVar: s.colorVar }]);
+        });
+        rect.addEventListener("pointerleave", hideTooltip);
+        rect.addEventListener("click", function () { onPick && onPick(g.label); });
       });
-      var xl = el("text", { x: groupLeft + groupW / 2, y: H - 10, class: "cat-label", "text-anchor": "middle" });
+      var xl = el("text", {
+        x: groupLeft + groupW / 2, y: H - 10, class: "cat-label", "text-anchor": "middle",
+        style: "cursor:pointer;" + (pinnedLabel === g.label ? "font-weight:700;fill:var(--text-primary);" : "")
+>>>>>>> origin/main
+      });
       xl.textContent = g.label;
+      xl.addEventListener("click", function () { onPick && onPick(g.label); });
       svg.appendChild(xl);
     });
   }
 
-  var methodSeries = [
-    { name: "SITF", color: cssVar("--series-sitf") },
-    { name: "Persistence-cummax", color: cssVar("--series-persistence") },
-    { name: "PLUM-R30, exclude target", color: cssVar("--series-plum") }
-  ];
-
-  renderGroupedBar("chart-precision-method", [
-    { label: "EW20", values: [91.50, 100.00, 35.71] },
-    { label: "EW30", values: [96.15, 100.00, 35.55] },
-    { label: "EW40", values: [96.39, 100.00, 35.23] }
-  ], methodSeries, 100, "%");
-
-  renderGroupedBar("chart-pod-method", [
-    { label: "EW20", values: [49.48, 47.39, 65.90] },
-    { label: "EW30", values: [59.52, 62.67, 80.53] },
-    { label: "EW40", values: [82.52, 80.32, 91.12] }
-  ], methodSeries, 100, "%");
-
-  /* ================= table view (accessible alternative) ================= */
-  var tableRows = [
-    ["SITF", "EW20", "91.50%", "49.48%", "0.642", "0.38%"],
-    ["Persistence-cummax", "EW20", "100.00%", "47.39%", "0.643", "0.00%"],
-    ["PLUM-R30, exclude target", "EW20", "35.71%", "65.90%", "0.463", "9.84%"],
-    ["SITF", "EW30", "96.15%", "59.52%", "0.735", "0.20%"],
-    ["Persistence-cummax", "EW30", "100.00%", "62.67%", "0.770", "0.00%"],
-    ["PLUM-R30, exclude target", "EW30", "35.55%", "80.53%", "0.493", "12.10%"],
-    ["SITF", "EW40", "96.39%", "82.52%", "0.889", "0.26%"],
-    ["Persistence-cummax", "EW40", "100.00%", "80.32%", "0.891", "0.00%"],
-    ["PLUM-R30, exclude target", "EW40", "35.23%", "91.12%", "0.508", "13.87%"]
-  ];
-  var colorMap = {
-    "SITF": cssVar("--series-sitf"),
-    "Persistence-cummax": cssVar("--series-persistence"),
-    "PLUM-R30, exclude target": cssVar("--series-plum")
+  var methodOrder = ["SITF", "Persistence-cummax", "PLUM-R30, exclude target"];
+  var methodColorVar = {
+    "SITF": "--series-sitf",
+    "Persistence-cummax": "--series-persistence",
+    "PLUM-R30, exclude target": "--series-plum"
   };
+<<<<<<< HEAD
   function highlightRows(method, windowLabel, on) {
     document.querySelectorAll('tr[data-method]').forEach(function (tr) {
       if (tr.dataset.method === method && tr.dataset.window === windowLabel) {
@@ -814,8 +894,245 @@
         td.textContent = val;
       }
       tr.appendChild(td);
+=======
+  var windowOrder = ["EW20", "EW30", "EW40"];
+  var compareData = [
+    { method: "SITF", window: "EW20", precision: 91.50, pod: 49.48, f1: 0.642, far: 0.38 },
+    { method: "Persistence-cummax", window: "EW20", precision: 100.00, pod: 47.39, f1: 0.643, far: 0.00 },
+    { method: "PLUM-R30, exclude target", window: "EW20", precision: 35.71, pod: 65.90, f1: 0.463, far: 9.84 },
+    { method: "SITF", window: "EW30", precision: 96.15, pod: 59.52, f1: 0.735, far: 0.20 },
+    { method: "Persistence-cummax", window: "EW30", precision: 100.00, pod: 62.67, f1: 0.770, far: 0.00 },
+    { method: "PLUM-R30, exclude target", window: "EW30", precision: 35.55, pod: 80.53, f1: 0.493, far: 12.10 },
+    { method: "SITF", window: "EW40", precision: 96.39, pod: 82.52, f1: 0.889, far: 0.26 },
+    { method: "Persistence-cummax", window: "EW40", precision: 100.00, pod: 80.32, f1: 0.891, far: 0.00 },
+    { method: "PLUM-R30, exclude target", window: "EW40", precision: 35.23, pod: 91.12, f1: 0.508, far: 13.87 }
+  ];
+  var metricConfig = {
+    precision: { label: "Precision", unit: "%", yMax: 100, decimals: 0, title: "Precision at I ≥ 4" },
+    pod: { label: "POD / Recall", unit: "%", yMax: 100, decimals: 0, title: "Detection (POD) at I ≥ 4" },
+    f1: { label: "F1 score", unit: "", yMax: 1, decimals: 2, title: "F1 score at I ≥ 4" },
+    far: { label: "False-alarm rate", unit: "%", yMax: 15, decimals: 0, title: "False-alarm rate at I ≥ 4" }
+  };
+  var state = { metric: "precision", active: new Set(methodOrder), pinned: null };
+
+  function renderLegend() {
+    var wrap = document.getElementById("method-legend");
+    clear(wrap);
+    methodOrder.forEach(function (m) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "key";
+      btn.setAttribute("aria-pressed", state.active.has(m) ? "true" : "false");
+      var sw = document.createElement("span");
+      sw.className = "swatch";
+      sw.style.background = "var(" + methodColorVar[m] + ")";
+      btn.appendChild(sw);
+      var txt = document.createElement("span");
+      txt.textContent = m;
+      btn.appendChild(txt);
+      btn.addEventListener("click", function () {
+        if (state.active.has(m)) {
+          if (state.active.size > 1) state.active.delete(m);
+        } else {
+          state.active.add(m);
+        }
+        renderLegend();
+        renderCompareChart();
+      });
+      wrap.appendChild(btn);
+>>>>>>> origin/main
     });
-    tbody.appendChild(tr);
+  }
+
+  function renderCompareChart() {
+    var cfg = metricConfig[state.metric];
+    document.getElementById("chart-compare-title").textContent = cfg.title;
+    document.getElementById("chart-compare-sub").textContent = "by early window — click a bar or window label to pin a side-by-side readout";
+    var activeMethods = methodOrder.filter(function (m) { return state.active.has(m); });
+    var series = activeMethods.map(function (m) { return { name: m, colorVar: methodColorVar[m] }; });
+    var groups = windowOrder.map(function (w) {
+      return {
+        label: w,
+        values: activeMethods.map(function (m) {
+          var d = compareData.filter(function (x) { return x.method === m && x.window === w; })[0];
+          return d[state.metric];
+        })
+      };
+    });
+    renderGroupedBar("chart-compare", groups, series, cfg.yMax, cfg.decimals, cfg.unit, state.pinned, function (label) {
+      state.pinned = state.pinned === label ? null : label;
+      renderCompareChart();
+      updatePinReadout();
+    });
+  }
+
+  function updatePinReadout() {
+    var out = document.getElementById("pin-readout");
+    if (!state.pinned) {
+      out.textContent = "Click a bar or a window label above to compare all three methods side by side at that window.";
+      return;
+    }
+    var w = state.pinned;
+    var parts = methodOrder.map(function (m) {
+      var d = compareData.filter(function (x) { return x.method === m && x.window === w; })[0];
+      return m + " — precision " + d.precision.toFixed(2) + "%, POD " + d.pod.toFixed(2) + "%, F1 " + d.f1.toFixed(3) + ", FAR " + d.far.toFixed(2) + "%";
+    });
+    out.textContent = "At " + w + ": " + parts.join("; ") + ".";
+  }
+
+  document.querySelectorAll("#metric-switch button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      state.metric = btn.getAttribute("data-metric");
+      document.querySelectorAll("#metric-switch button").forEach(function (b) {
+        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+      });
+      renderCompareChart();
+    });
+  });
+
+  renderLegend();
+  renderCompareChart();
+  updatePinReadout();
+
+  /* ================= sortable table (accessible alternative) ================= */
+  function renderCompareTable(sortKey, sortDir) {
+    var rows = compareData.slice();
+    if (sortKey) {
+      rows.sort(function (r1, r2) {
+        var v1 = r1[sortKey], v2 = r2[sortKey];
+        if (typeof v1 === "string") { v1 = v1.toLowerCase(); v2 = v2.toLowerCase(); }
+        if (v1 < v2) return -1 * sortDir;
+        if (v1 > v2) return 1 * sortDir;
+        return 0;
+      });
+    }
+    var tbody = document.getElementById("table-body");
+    clear(tbody);
+    rows.forEach(function (d) {
+      var tr = document.createElement("tr");
+      var cells = [d.method, d.window, d.precision.toFixed(2) + "%", d.pod.toFixed(2) + "%", d.f1.toFixed(3), d.far.toFixed(2) + "%"];
+      cells.forEach(function (val, ci) {
+        var td = document.createElement("td");
+        if (ci === 0) {
+          td.className = "method-key";
+          var k = document.createElement("span");
+          k.className = "k";
+          k.style.background = "var(" + methodColorVar[d.method] + ")";
+          td.appendChild(k);
+          var span = document.createElement("span");
+          span.textContent = val;
+          td.appendChild(span);
+        } else {
+          td.textContent = val;
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  var sortState = { key: null, dir: 1 };
+  var thKeys = { 0: "method", 1: "window", 2: "precision", 3: "pod", 4: "f1", 5: "far" };
+  document.querySelectorAll("#compare-table thead th").forEach(function (th, idx) {
+    th.addEventListener("click", function () {
+      var key = thKeys[idx];
+      if (sortState.key === key) sortState.dir *= -1;
+      else { sortState.key = key; sortState.dir = 1; }
+      document.querySelectorAll("#compare-table thead th .sort-arrow").forEach(function (a) { a.remove(); });
+      var arrow = document.createElement("span");
+      arrow.className = "sort-arrow";
+      arrow.textContent = " " + (sortState.dir === 1 ? "▲" : "▼");
+      th.appendChild(arrow);
+      renderCompareTable(sortState.key, sortState.dir);
+    });
+  });
+  renderCompareTable(null, 1);
+
+  /* ================= scroll interactions ================= */
+
+  // scrollspy
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.topnav a[href^="#"]'));
+  var spySections = navLinks
+    .map(function (a) { return { link: a, section: document.querySelector(a.getAttribute("href")) }; })
+    .filter(function (x) { return x.section; });
+  if ("IntersectionObserver" in window && spySections.length) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var match = spySections.filter(function (x) { return x.section === entry.target; })[0];
+        if (!match) return;
+        if (entry.isIntersecting) {
+          navLinks.forEach(function (l) { l.classList.remove("active"); });
+          match.link.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
+    spySections.forEach(function (x) { spy.observe(x.section); });
+  }
+
+  // reveal-on-scroll for cards and tiles, with count-up for clean numeric stat tiles
+  function animateCount(valueEl) {
+    var node = valueEl.firstChild;
+    if (!node || node.nodeType !== 3) return;
+    var text = node.textContent;
+    var m = text.match(/^-?[\d,]+(\.\d+)?/);
+    if (!m) return;
+    var rawMatch = m[0];
+    if (text.slice(rawMatch.length).length > 0) return; // only animate clean numeric text nodes
+    if (reduceMotion) return;
+    var hasComma = rawMatch.indexOf(",") !== -1;
+    var decimals = (rawMatch.split(".")[1] || "").length;
+    var target = parseFloat(rawMatch.replace(/,/g, ""));
+    if (isNaN(target)) return;
+    var duration = 900, start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = target * eased;
+      var out = val.toFixed(decimals);
+      if (hasComma) out = Number(out).toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      node.textContent = out;
+      if (p < 1) requestAnimationFrame(frame);
+      else node.textContent = rawMatch;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  if ("IntersectionObserver" in window) {
+    var revealEls = document.querySelectorAll(".card, .tile");
+    var ro = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          ro.unobserve(entry.target);
+          var val = entry.target.querySelector(".t-value");
+          if (val) animateCount(val);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (elx) { elx.classList.add("reveal"); ro.observe(elx); });
+
+    var limitItems = document.querySelectorAll(".limits li");
+    var lro = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { entry.target.classList.add("in-view"); lro.unobserve(entry.target); }
+      });
+    }, { threshold: 0.4 });
+    limitItems.forEach(function (li, i) {
+      li.style.transitionDelay = reduceMotion ? "0ms" : (i * 60) + "ms";
+      lro.observe(li);
+    });
+  } else {
+    document.querySelectorAll(".card, .tile, .limits li").forEach(function (elx) { elx.classList.add("in-view"); });
+  }
+
+  // back-to-top button
+  var backBtn = document.getElementById("back-to-top");
+  window.addEventListener("scroll", function () {
+    backBtn.classList.toggle("show", window.scrollY > 600);
+  }, { passive: true });
+  backBtn.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
 
   /* ================= legend click-to-isolate ================= */
