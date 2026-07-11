@@ -75,46 +75,6 @@
   a { color: var(--series-sitf); }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-  /* ---------- scroll progress ---------- */
-  #scroll-progress {
-    position: fixed; top: 0; left: 0; height: 2.5px; width: 0%;
-    background: var(--series-sitf); z-index: 30; transition: width .08s linear;
-  }
-
-  /* ---------- reveal-on-scroll ---------- */
-  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .55s ease, transform .55s ease; }
-  .reveal.is-visible { opacity: 1; transform: none; }
-
-  /* ---------- back to top ---------- */
-  #back-to-top {
-    position: fixed; right: 22px; bottom: 22px; z-index: 25;
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--surface-1); color: var(--text-secondary); border: 1px solid var(--border);
-    box-shadow: var(--card-shadow); cursor: pointer; font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transform: translateY(8px);
-    transition: opacity .2s ease, transform .2s ease, color .15s ease;
-  }
-  #back-to-top.show { opacity: 1; pointer-events: auto; transform: none; }
-  #back-to-top:hover { color: var(--text-primary); }
-
-  /* ---------- toast ---------- */
-  #toast {
-    position: fixed; left: 50%; bottom: 28px; z-index: 100;
-    background: var(--text-primary); color: var(--surface-1);
-    font-size: 13px; padding: 9px 16px; border-radius: 999px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    opacity: 0; transform: translate(-50%, 8px); transition: opacity .18s ease, transform .18s ease;
-    pointer-events: none;
-  }
-  #toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .reveal { opacity: 1; transform: none; transition: none; }
-    #back-to-top, #toast { transition: none; }
-  }
-
   /* ---------- top bar ---------- */
   .topbar {
     position: sticky; top: 0; z-index: 20;
@@ -123,15 +83,6 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; max-width: 1080px; }
-<<<<<<< HEAD
-  .brand { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; color: var(--text-primary); text-decoration: none; }
-  .topnav { display: flex; gap: 20px; align-items: center; }
-  .topnav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; position: relative; padding-bottom: 2px; }
-  .topnav a:hover { color: var(--text-primary); }
-  .topnav a.active { color: var(--text-primary); }
-  .topnav a.active::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
-=======
   .brand { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; color: var(--text-primary); text-decoration: none; flex: none; }
   .topnav { display: flex; gap: 20px; align-items: center; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
   .topnav::-webkit-scrollbar { display: none; }
@@ -140,7 +91,6 @@
   .topnav a.active { color: var(--text-primary); font-weight: 600; }
   .topnav a.active::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px;
->>>>>>> origin/main
     background: var(--series-sitf); border-radius: 2px;
   }
   #theme-toggle {
@@ -176,15 +126,7 @@
   section.divider { border-top: 1px solid var(--border); }
   .section-head { margin-bottom: 24px; }
   .kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--series-sitf); margin-bottom: 8px; }
-  h2 { font-size: clamp(22px, 3vw, 28px); margin: 0 0 8px; letter-spacing: -0.01em; position: relative; }
-  section[id] { scroll-margin-top: 72px; }
-  .section-head { position: relative; }
-  .anchor-link {
-    position: absolute; left: -22px; top: 3px; opacity: 0; text-decoration: none;
-    color: var(--text-muted); font-size: 16px; transition: opacity .12s ease;
-  }
-  .section-head:hover .anchor-link { opacity: 1; }
-  .anchor-link:hover { color: var(--series-sitf); }
+  h2 { font-size: clamp(22px, 3vw, 28px); margin: 0 0 8px; letter-spacing: -0.01em; }
   .lede { color: var(--text-secondary); max-width: 720px; margin: 0; font-size: 15px; }
 
   .card {
@@ -238,10 +180,6 @@
   .legend-row .key[aria-pressed="false"] { opacity: .4; }
   .legend-row .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
   .legend-row .swatch.line { width: 14px; height: 2px; border-radius: 1px; }
-  #method-legend .key { cursor: pointer; user-select: none; padding: 3px 8px 3px 4px; border-radius: 999px; border: 1px solid transparent; transition: opacity .15s ease, border-color .15s ease, background .15s ease; }
-  #method-legend .key:hover { border-color: var(--border); background: var(--page); }
-  #method-legend .key.inactive { opacity: 0.35; }
-  #method-legend .key:focus-visible { outline: 2px solid var(--series-sitf); outline-offset: 2px; }
 
   /* ---------- metric segmented control ---------- */
   .seg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
@@ -254,12 +192,8 @@
   .seg button[aria-pressed="true"] { background: var(--series-sitf); border-color: var(--series-sitf); color: #fff; }
 
   /* hoverable marks */
-  .bar-mark, .dot-mark { cursor: pointer; transition: opacity .12s ease, fill-opacity .15s ease; }
+  .bar-mark, .dot-mark { cursor: pointer; transition: opacity .12s ease; }
   .bar-mark:hover, .dot-mark:hover { opacity: 0.75; }
-  .bar-mark.dimmed { fill-opacity: 0.12; }
-
-  tbody tr { transition: background-color .12s ease; }
-  tbody tr.row-highlight { background-color: var(--page); }
 
   #tooltip {
     position: fixed; pointer-events: none; z-index: 100;
@@ -290,13 +224,8 @@
   .table-scroll { overflow-x: auto; }
 
   /* ---------- pathway cards ---------- */
-<<<<<<< HEAD
-  .pathway { border-top: 3px solid var(--card-accent, var(--series-sitf)); transition: transform .18s ease, box-shadow .18s ease; }
-  .pathway:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(11,11,11,0.07), 0 14px 32px rgba(11,11,11,0.08); }
-=======
   .pathway { border-top: 3px solid var(--card-accent, var(--series-sitf)); transition: transform .2s ease, box-shadow .2s ease; }
   .pathway:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(11,11,11,0.06), 0 14px 28px rgba(11,11,11,0.08); }
->>>>>>> origin/main
   .pathway .p-eyebrow { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--card-accent, var(--series-sitf)); margin-bottom: 8px; }
   .pathway h3 { font-size: 17px; margin: 0 0 8px; }
   .pathway p { font-size: 13.5px; color: var(--text-secondary); margin: 0; }
@@ -318,6 +247,13 @@
   footer a { color: var(--text-secondary); text-decoration: none; }
   footer a:hover { color: var(--text-primary); }
 
+  /* ---------- scroll progress ---------- */
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; height: 2.5px; width: 0%;
+    background: var(--series-sitf); z-index: 40; transition: width .08s linear;
+    pointer-events: none;
+  }
+
   /* ---------- back to top ---------- */
   #back-to-top {
     position: fixed; right: 20px; bottom: 20px; z-index: 30;
@@ -329,11 +265,36 @@
   }
   #back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
   #back-to-top:hover { color: var(--text-primary); }
+
+  /* ---------- toast ---------- */
+  #toast {
+    position: fixed; left: 50%; bottom: 28px; z-index: 100;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 13px; padding: 9px 16px; border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    opacity: 0; transform: translate(-50%, 8px); transition: opacity .18s ease, transform .18s ease;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- anchor links ---------- */
+  .section-head { position: relative; }
+  h2 { position: relative; }
+  .anchor-link {
+    position: absolute; left: -22px; top: 3px; opacity: 0; text-decoration: none;
+    color: var(--text-muted); font-size: 16px; transition: opacity .12s ease;
+  }
+  .section-head:hover .anchor-link { opacity: 1; }
+  .anchor-link:hover { color: var(--series-sitf); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #toast { transition: none; }
+  }
 </style>
 </head>
 <body>
 
-<div id="scroll-progress"></div>
+<div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
 
 <div class="topbar">
   <div class="wrap">
@@ -485,31 +446,12 @@
       <p class="lede">SITF sits between conservative target-station persistence and an aggressive propagation-only
         PLUM-like baseline. Switch metrics, click a method chip to isolate it, or click a bar to pin a side-by-side readout.</p>
     </div>
-<<<<<<< HEAD
-    <div class="legend-row" id="method-legend">
-      <span class="key" data-series="SITF" role="button" tabindex="0" aria-pressed="true"><span class="swatch" style="background:var(--series-sitf)"></span>SITF</span>
-      <span class="key" data-series="Persistence-cummax" role="button" tabindex="0" aria-pressed="true"><span class="swatch" style="background:var(--series-persistence)"></span>Persistence-cummax</span>
-      <span class="key" data-series="PLUM-R30, exclude target" role="button" tabindex="0" aria-pressed="true"><span class="swatch" style="background:var(--series-plum)"></span>PLUM-R30, exclude target</span>
-    </div>
-    <div class="chart-sub" style="margin:-6px 0 14px;">Click a method to isolate it in both charts below.</div>
-    <div class="grid-2">
-      <div class="card chart-card">
-        <h3>Precision at I ≥ 4</h3>
-        <div class="chart-sub">by early window, three methods</div>
-        <svg class="chart" id="chart-precision-method" viewBox="0 0 460 260" role="img" aria-label="Grouped bar chart of precision by method across EW20, EW30 and EW40"></svg>
-      </div>
-      <div class="card chart-card">
-        <h3>Detection (POD) at I ≥ 4</h3>
-        <div class="chart-sub">by early window, three methods</div>
-        <svg class="chart" id="chart-pod-method" viewBox="0 0 460 260" role="img" aria-label="Grouped bar chart of probability of detection by method across EW20, EW30 and EW40"></svg>
-=======
     <div class="card chart-card">
       <div class="seg" id="metric-switch" role="tablist" aria-label="Metric to display">
         <button type="button" data-metric="precision" aria-pressed="true">Precision</button>
         <button type="button" data-metric="pod" aria-pressed="false">POD / Recall</button>
         <button type="button" data-metric="f1" aria-pressed="false">F1</button>
         <button type="button" data-metric="far" aria-pressed="false">FAR</button>
->>>>>>> origin/main
       </div>
       <div class="legend-row" id="method-legend"></div>
       <h3 id="chart-compare-title">Precision at I ≥ 4</h3>
@@ -661,10 +603,7 @@
 </footer>
 
 <div id="tooltip" role="status" aria-live="polite"></div>
-<<<<<<< HEAD
 <div id="toast" role="status" aria-live="polite"></div>
-=======
->>>>>>> origin/main
 <button id="back-to-top" aria-label="Back to top" title="Back to top">↑</button>
 
 <script>
@@ -828,18 +767,6 @@
         var barH = (v / yMax) * plotH;
         var x = startX + si * (barW + gap);
         var y = y0 - barH;
-<<<<<<< HEAD
-        var rect = el("rect", { x: x, y: y, width: barW, height: Math.max(barH, 1.5), rx: 3, ry: 3, fill: s.color, class: "bar-mark", "data-series": s.name, "data-window": g.label });
-        svg.appendChild(rect);
-        rect.addEventListener("pointermove", function (evt) {
-          showTooltip(evt, [{ text: g.label }, { text: s.name + ": " + v + unit, color: s.color }]);
-          highlightRows(s.name, g.label, true);
-        });
-        rect.addEventListener("pointerleave", function () {
-          hideTooltip();
-          highlightRows(s.name, g.label, false);
-        });
-=======
         var rect = el("rect", { x: x, y: y, width: barW, height: Math.max(barH, 1.5), rx: 3, ry: 3, class: "bar-mark", style: "fill:var(" + s.colorVar + ")" });
         svg.appendChild(rect);
         rect.addEventListener("pointermove", function (evt) {
@@ -851,7 +778,6 @@
       var xl = el("text", {
         x: groupLeft + groupW / 2, y: H - 10, class: "cat-label", "text-anchor": "middle",
         style: "cursor:pointer;" + (pinnedLabel === g.label ? "font-weight:700;fill:var(--text-primary);" : "")
->>>>>>> origin/main
       });
       xl.textContent = g.label;
       xl.addEventListener("click", function () { onPick && onPick(g.label); });
@@ -865,36 +791,6 @@
     "Persistence-cummax": "--series-persistence",
     "PLUM-R30, exclude target": "--series-plum"
   };
-<<<<<<< HEAD
-  function highlightRows(method, windowLabel, on) {
-    document.querySelectorAll('tr[data-method]').forEach(function (tr) {
-      if (tr.dataset.method === method && tr.dataset.window === windowLabel) {
-        tr.classList.toggle("row-highlight", on);
-      }
-    });
-  }
-
-  var tbody = document.getElementById("table-body");
-  tableRows.forEach(function (row) {
-    var tr = document.createElement("tr");
-    tr.dataset.method = row[0];
-    tr.dataset.window = row[1];
-    row.forEach(function (val, ci) {
-      var td = document.createElement("td");
-      if (ci === 0) {
-        td.className = "method-key";
-        var k = document.createElement("span");
-        k.className = "k";
-        k.style.background = colorMap[val];
-        td.appendChild(k);
-        var span = document.createElement("span");
-        span.textContent = val;
-        td.appendChild(span);
-      } else {
-        td.textContent = val;
-      }
-      tr.appendChild(td);
-=======
   var windowOrder = ["EW20", "EW30", "EW40"];
   var compareData = [
     { method: "SITF", window: "EW20", precision: 91.50, pod: 49.48, f1: 0.642, far: 0.38 },
@@ -940,7 +836,6 @@
         renderCompareChart();
       });
       wrap.appendChild(btn);
->>>>>>> origin/main
     });
   }
 
@@ -1135,37 +1030,6 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
 
-  /* ================= legend click-to-isolate ================= */
-  var legendKeys = document.querySelectorAll("#method-legend .key");
-  legendKeys.forEach(function (key) {
-    function toggle() {
-      var anyInactive = Array.prototype.some.call(legendKeys, function (k) { return k.classList.contains("inactive"); });
-      var isActive = !key.classList.contains("inactive");
-      if (!anyInactive) {
-        // isolate: deactivate all others
-        legendKeys.forEach(function (k) { k.classList.toggle("inactive", k !== key); k.setAttribute("aria-pressed", k === key ? "true" : "false"); });
-      } else if (isActive && legendKeys.length && Array.prototype.filter.call(legendKeys, function (k) { return !k.classList.contains("inactive"); }).length === 1) {
-        // clicking the only active one restores all
-        legendKeys.forEach(function (k) { k.classList.remove("inactive"); k.setAttribute("aria-pressed", "true"); });
-      } else {
-        key.classList.toggle("inactive");
-        key.setAttribute("aria-pressed", key.classList.contains("inactive") ? "false" : "true");
-      }
-      var activeNames = Array.prototype.filter.call(legendKeys, function (k) { return !k.classList.contains("inactive"); })
-        .map(function (k) { return k.dataset.series; });
-      document.querySelectorAll(".bar-mark[data-series]").forEach(function (rect) {
-        rect.classList.toggle("dimmed", activeNames.indexOf(rect.dataset.series) === -1);
-      });
-      document.querySelectorAll("tr[data-method]").forEach(function (tr) {
-        tr.style.opacity = activeNames.indexOf(tr.dataset.method) === -1 ? "0.35" : "";
-      });
-    }
-    key.addEventListener("click", toggle);
-    key.addEventListener("keydown", function (evt) {
-      if (evt.key === "Enter" || evt.key === " ") { evt.preventDefault(); toggle(); }
-    });
-  });
-
   /* ================= scroll progress ================= */
   var progressBar = document.getElementById("scroll-progress");
   function updateProgress() {
@@ -1176,90 +1040,6 @@
   }
   window.addEventListener("scroll", updateProgress, { passive: true });
   updateProgress();
-
-  /* ================= scrollspy nav ================= */
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".topnav a[href^='#']"));
-  var navSections = navLinks
-    .map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); })
-    .filter(Boolean);
-  if (navSections.length && "IntersectionObserver" in window) {
-    var spy = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var link = navLinks.filter(function (a) { return a.getAttribute("href") === "#" + entry.target.id; })[0];
-        if (!link) return;
-        if (entry.isIntersecting) {
-          navLinks.forEach(function (a) { a.classList.remove("active"); });
-          link.classList.add("active");
-        }
-      });
-    }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
-    navSections.forEach(function (s) { spy.observe(s); });
-  }
-
-  /* ================= reveal-on-scroll ================= */
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var revealTargets = document.querySelectorAll(".card, .pathway, .tiles");
-  if (!reduceMotion && "IntersectionObserver" in window) {
-    revealTargets.forEach(function (t) { t.classList.add("reveal"); });
-    var revealer = new IntersectionObserver(function (entries, obs) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: "0px 0px -60px 0px" });
-    revealTargets.forEach(function (t) { revealer.observe(t); });
-  }
-
-  /* ================= animated stat counters ================= */
-  function animateValue(node, from, to, decimals, suffix, duration) {
-    var start = null;
-    function step(ts) {
-      if (start === null) start = ts;
-      var progress = Math.min((ts - start) / duration, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
-      var current = from + (to - from) * eased;
-      node.textContent = current.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
-      if (progress < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  if (!reduceMotion && "IntersectionObserver" in window) {
-    var counters = new IntersectionObserver(function (entries, obs) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        obs.unobserve(entry.target);
-        var valueEl = entry.target;
-        var unitEl = valueEl.querySelector(".unit");
-        var unitText = unitEl ? unitEl.outerHTML : "";
-        var rawText = unitEl ? valueEl.textContent.replace(unitEl.textContent, "") : valueEl.textContent;
-        var match = rawText.trim().match(/^([\d,]+)(\.\d+)?$/);
-        if (!match) return;
-        var intPart = match[1].replace(/,/g, "");
-        var decPart = match[2] ? match[2].slice(1) : "";
-        var decimals = decPart.length;
-        var target = parseFloat(decPart ? intPart + "." + decPart : intPart);
-        if (isNaN(target)) return;
-        animateValue(valueEl, 0, target, decimals, "", 900);
-        if (unitEl) {
-          setTimeout(function () {
-            if (!valueEl.querySelector(".unit")) valueEl.insertAdjacentHTML("beforeend", unitText);
-          }, 900);
-        }
-      });
-    }, { threshold: 0.4 });
-    document.querySelectorAll(".tile .t-value").forEach(function (v) { counters.observe(v); });
-  }
-
-  /* ================= back to top ================= */
-  var backToTop = document.getElementById("back-to-top");
-  window.addEventListener("scroll", function () {
-    backToTop.classList.toggle("show", window.scrollY > 480);
-  }, { passive: true });
-  backToTop.addEventListener("click", function () {
-    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-  });
 
   /* ================= copyable section links ================= */
   var toast = document.getElementById("toast");
