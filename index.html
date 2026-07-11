@@ -219,7 +219,7 @@
   td.method-key { display: flex; align-items: center; gap: 8px; }
   td .k { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
   tbody tr { transition: background .15s ease; }
-  tbody tr:hover { background: color-mix(in srgb, var(--surface-1) 92%, var(--series-sitf)); }
+  tbody tr:hover, tbody tr.row-highlight { background: color-mix(in srgb, var(--surface-1) 92%, var(--series-sitf)); }
   tbody tr:last-child td { border-bottom: none; }
   .table-scroll { overflow-x: auto; }
 
@@ -247,6 +247,13 @@
   footer a { color: var(--text-secondary); text-decoration: none; }
   footer a:hover { color: var(--text-primary); }
 
+  /* ---------- scroll progress ---------- */
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; height: 2.5px; width: 0%;
+    background: var(--series-sitf); z-index: 40; transition: width .08s linear;
+    pointer-events: none;
+  }
+
   /* ---------- back to top ---------- */
   #back-to-top {
     position: fixed; right: 20px; bottom: 20px; z-index: 30;
@@ -258,9 +265,36 @@
   }
   #back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
   #back-to-top:hover { color: var(--text-primary); }
+
+  /* ---------- toast ---------- */
+  #toast {
+    position: fixed; left: 50%; bottom: 28px; z-index: 100;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 13px; padding: 9px 16px; border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    opacity: 0; transform: translate(-50%, 8px); transition: opacity .18s ease, transform .18s ease;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- anchor links ---------- */
+  .section-head { position: relative; }
+  h2 { position: relative; }
+  .anchor-link {
+    position: absolute; left: -22px; top: 3px; opacity: 0; text-decoration: none;
+    color: var(--text-muted); font-size: 16px; transition: opacity .12s ease;
+  }
+  .section-head:hover .anchor-link { opacity: 1; }
+  .anchor-link:hover { color: var(--series-sitf); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #toast { transition: none; }
+  }
 </style>
 </head>
 <body>
+
+<div id="scroll-progress" role="progressbar" aria-hidden="true"></div>
 
 <div class="topbar">
   <div class="wrap">
@@ -355,7 +389,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Overall forecast accuracy</div>
-      <h2>Skill improves as more of the sequence arrives</h2>
+      <h2><a class="anchor-link" href="#results" aria-label="Link to this section">#</a>Skill improves as more of the sequence arrives</h2>
       <p class="lede">Across the 161-event independent evaluation, both classification and regression accuracy improve
         steadily from the 5&#8209;second window (EW05) to the 40&#8209;second window (EW40).</p>
     </div>
@@ -388,7 +422,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">National public-warning threshold, I ≥ 4</div>
-      <h2>A non-monotonic path to a high-precision regime</h2>
+      <h2><a class="anchor-link" href="#threshold" aria-label="Link to this section">#</a>A non-monotonic path to a high-precision regime</h2>
       <p class="lede">Threshold discrimination is strongly window-dependent: precision dips near EW15 before recovering
         sharply by EW20 and stabilizing above 96% by EW30–EW40, while the false-alarm rate mirrors the same trough.
         Hover the chart to compare both curves at any window.</p>
@@ -408,7 +442,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Comparison with direct-observation baselines</div>
-      <h2>Different methods, different operating points</h2>
+      <h2><a class="anchor-link" href="#compare" aria-label="Link to this section">#</a>Different methods, different operating points</h2>
       <p class="lede">SITF sits between conservative target-station persistence and an aggressive propagation-only
         PLUM-like baseline. Switch metrics, click a method chip to isolate it, or click a bar to pin a side-by-side readout.</p>
     </div>
@@ -453,7 +487,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Complementarity with eBEAR</div>
-      <h2>Different failure modes, one union</h2>
+      <h2><a class="anchor-link" href="#ebear" aria-label="Link to this section">#</a>Different failure modes, one union</h2>
       <p class="lede">In a 160-event matched sensitivity analysis, an event-level SITF rule (EW20 or later) recovers
         every eBEAR miss while adding only one false positive.</p>
     </div>
@@ -481,7 +515,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">A layered warning architecture</div>
-      <h2>Three pathways, three different jobs</h2>
+      <h2><a class="anchor-link" href="#method" aria-label="Link to this section">#</a>Three pathways, three different jobs</h2>
       <p class="lede">The scientific claim is not that SITF dominates — it occupies a distinct, low-false-alarm
         operating point that complements the other two pathways.</p>
     </div>
@@ -512,7 +546,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Model architecture &amp; training</div>
-      <h2>A compact temporal Transformer</h2>
+      <h2><a class="anchor-link" href="#architecture" aria-label="Link to this section">#</a>A compact temporal Transformer</h2>
       <p class="lede">A temporal convolutional embedding feeds a Transformer encoder; pooled encoded frames drive a
         10-class ordered-intensity head and a continuous-intensity regression head.</p>
     </div>
@@ -538,7 +572,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Limitations</div>
-      <h2>What this result does not yet show</h2>
+      <h2><a class="anchor-link" href="#limitations" aria-label="Link to this section">#</a>What this result does not yet show</h2>
     </div>
     <div class="card">
       <ol class="limits">
@@ -569,6 +603,7 @@
 </footer>
 
 <div id="tooltip" role="status" aria-live="polite"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <button id="back-to-top" aria-label="Back to top" title="Back to top">↑</button>
 
 <script>
@@ -736,8 +771,12 @@
         svg.appendChild(rect);
         rect.addEventListener("pointermove", function (evt) {
           showTooltip(evt, [{ text: g.label }, { text: s.name + ": " + (decimals ? v.toFixed(decimals) : Math.round(v)) + unit, colorVar: s.colorVar }]);
+          highlightRows(s.name, g.label, true);
         });
-        rect.addEventListener("pointerleave", hideTooltip);
+        rect.addEventListener("pointerleave", function () {
+          hideTooltip();
+          highlightRows(s.name, g.label, false);
+        });
         rect.addEventListener("click", function () { onPick && onPick(g.label); });
       });
       var xl = el("text", {
@@ -855,6 +894,14 @@
   updatePinReadout();
 
   /* ================= sortable table (accessible alternative) ================= */
+  function highlightRows(method, windowLabel, on) {
+    document.querySelectorAll("tr[data-method]").forEach(function (tr) {
+      if (tr.dataset.method === method && tr.dataset.window === windowLabel) {
+        tr.classList.toggle("row-highlight", on);
+      }
+    });
+  }
+
   function renderCompareTable(sortKey, sortDir) {
     var rows = compareData.slice();
     if (sortKey) {
@@ -870,6 +917,8 @@
     clear(tbody);
     rows.forEach(function (d) {
       var tr = document.createElement("tr");
+      tr.dataset.method = d.method;
+      tr.dataset.window = d.window;
       var cells = [d.method, d.window, d.precision.toFixed(2) + "%", d.pod.toFixed(2) + "%", d.f1.toFixed(3), d.far.toFixed(2) + "%"];
       cells.forEach(function (val, ci) {
         var td = document.createElement("td");
@@ -993,6 +1042,38 @@
   }, { passive: true });
   backBtn.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  /* ================= scroll progress ================= */
+  var progressBar = document.getElementById("scroll-progress");
+  function updateProgress() {
+    var doc = document.documentElement;
+    var scrollable = doc.scrollHeight - doc.clientHeight;
+    var pct = scrollable > 0 ? (doc.scrollTop / scrollable) * 100 : 0;
+    progressBar.style.width = pct + "%";
+  }
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  updateProgress();
+
+  /* ================= copyable section links ================= */
+  var toast = document.getElementById("toast");
+  var toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 1600);
+  }
+  document.querySelectorAll(".anchor-link").forEach(function (a) {
+    a.addEventListener("click", function (evt) {
+      evt.preventDefault();
+      var url = location.href.split("#")[0] + a.getAttribute("href");
+      history.replaceState(null, "", a.getAttribute("href"));
+      document.querySelector(a.getAttribute("href")).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { showToast("Section link copied"); }).catch(function () {});
+      }
+    });
   });
 })();
 </script>
