@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SITF — Observation-Driven Second-by-Second Seismic-Intensity Forecasting</title>
+<meta name="description" content="SITF forecasts final station-level seismic intensity from incomplete one-second sequences, as a low-false-alarm complement to Taiwan's source-parameter earthquake early warning.">
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --card-shadow:    0 1px 2px rgba(11,11,11,0.04), 0 8px 24px rgba(11,11,11,0.05);
+
+    --series-sitf:        #2a78d6; /* blue   — slot 1 */
+    --series-persistence: #1baf7a; /* aqua   — slot 2 */
+    --series-plum:        #eda100; /* yellow — slot 3 */
+    --series-ebear:       #4a3aa7; /* violet — slot 5 */
+
+    --seq-100: #cde2fb; --seq-450: #2a78d6; --seq-700: #0d366b;
+
+    --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  }
+  :root[data-theme="dark"] {
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --card-shadow:    0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+
+    --series-sitf:        #3987e5;
+    --series-persistence: #199e70;
+    --series-plum:        #c98500;
+    --series-ebear:       #9085e9;
+
+    --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --card-shadow:    0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+      --series-sitf:        #3987e5;
+      --series-persistence: #199e70;
+      --series-plum:        #c98500;
+      --series-ebear:       #9085e9;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--series-sitf); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; max-width: 1080px; }
+  .brand { font-weight: 600; font-size: 14px; letter-spacing: 0.02em; color: var(--text-primary); text-decoration: none; }
+  .topnav { display: flex; gap: 20px; align-items: center; }
+  .topnav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+  .topnav a:hover { color: var(--text-primary); }
+  #theme-toggle {
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
+    border-radius: 999px; width: 32px; height: 32px; cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #theme-toggle:hover { color: var(--text-primary); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 64px 0 40px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-secondary); border: 1px solid var(--border); border-radius: 999px;
+    padding: 5px 12px; margin-bottom: 20px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--series-sitf); }
+  h1 { font-size: clamp(28px, 4vw, 42px); line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .subtitle { font-size: clamp(16px, 2vw, 19px); color: var(--text-secondary); max-width: 700px; margin: 0 0 28px; }
+  .authors { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+  .authors strong { color: var(--text-primary); font-weight: 600; }
+  .affil { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 12.5px; color: var(--text-secondary); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px;
+  }
+
+  /* ---------- generic section / card ---------- */
+  section { padding: 40px 0; }
+  section.divider { border-top: 1px solid var(--border); }
+  .section-head { margin-bottom: 24px; }
+  .kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--series-sitf); margin-bottom: 8px; }
+  h2 { font-size: clamp(22px, 3vw, 28px); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .lede { color: var(--text-secondary); max-width: 720px; margin: 0; font-size: 15px; }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: var(--card-shadow); padding: 24px;
+  }
+
+  /* ---------- abstract ---------- */
+  .abstract p { color: var(--text-secondary); font-size: 15px; margin: 0; }
+  .abstract .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
+
+  /* ---------- stat tiles ---------- */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .tile { background: var(--surface-1); padding: 22px 20px; }
+  .tile .t-label { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 10px; }
+  .tile .t-value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; }
+  .tile .t-delta { font-size: 12.5px; margin-top: 8px; color: var(--text-muted); }
+  .tile .t-delta.good { color: var(--good); }
+  .tile .t-value .unit { font-size: 16px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
+
+  /* ---------- two-col grid ---------- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .chart-card h3 { font-size: 15px; margin: 0 0 2px; }
+  .chart-card .chart-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+  svg.chart { width: 100%; height: auto; overflow: visible; }
+  .axis-label, .cat-label { fill: var(--text-muted); font-size: 10.5px; font-family: system-ui, sans-serif; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .value-label { fill: var(--text-secondary); font-size: 10px; font-weight: 600; font-family: system-ui, sans-serif; }
+  .legend-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12.5px; color: var(--text-secondary); }
+  .legend-row .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-row .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .legend-row .swatch.line { width: 14px; height: 2px; border-radius: 1px; }
+
+  /* hoverable marks */
+  .bar-mark, .dot-mark { cursor: pointer; transition: opacity .12s ease; }
+  .bar-mark:hover, .dot-mark:hover { opacity: 0.75; }
+
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 100;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 12px; padding: 7px 10px; border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    opacity: 0; transform: translate(-50%, calc(-100% - 10px)); transition: opacity .1s ease;
+    white-space: nowrap;
+  }
+  #tooltip.show { opacity: 1; }
+  #tooltip .tt-title { font-weight: 600; margin-bottom: 2px; }
+  #tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  #tooltip .tt-key { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+  /* ---------- table ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: right; padding: 10px 12px; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; font-variant-numeric: normal; }
+  th { color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  td.method-key { display: flex; align-items: center; gap: 8px; }
+  td .k { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: none; }
+  tbody tr:last-child td { border-bottom: none; }
+  .table-scroll { overflow-x: auto; }
+
+  /* ---------- pathway cards ---------- */
+  .pathway { border-top: 3px solid var(--card-accent, var(--series-sitf)); }
+  .pathway .p-eyebrow { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--card-accent, var(--series-sitf)); margin-bottom: 8px; }
+  .pathway h3 { font-size: 17px; margin: 0 0 8px; }
+  .pathway p { font-size: 13.5px; color: var(--text-secondary); margin: 0; }
+
+  /* ---------- limitations ---------- */
+  .limits { padding-left: 0; margin: 0; list-style: none; display: grid; gap: 12px; }
+  .limits li { display: flex; gap: 12px; font-size: 14px; color: var(--text-secondary); }
+  .limits .n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--surface-1); border: 1px solid var(--border); color: var(--text-muted); font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  /* ---------- arch spec ---------- */
+  .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin-top: 4px; }
+  .spec-grid .s-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .spec-grid .s-value { font-size: 16px; font-weight: 600; }
+  .formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; background: var(--page); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin: 16px 0 0; color: var(--text-primary); }
+
+  footer { border-top: 1px solid var(--border); padding: 32px 0 48px; }
+  footer .foot-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--text-muted); }
+  footer a { color: var(--text-secondary); text-decoration: none; }
+  footer a:hover { color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">SITF · Second-by-Second Intensity Forecaster</a>
+    <div class="topnav">
+      <a href="#results">Results</a>
+      <a href="#compare">Comparison</a>
+      <a href="#method">Method</a>
+      <a href="#limitations">Limitations</a>
+      <a href="https://github.com/oceanicdayi/Srl_seismic_intensity" target="_blank" rel="noopener">Manuscript</a>
+      <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
+    </div>
+  </div>
+</div>
+
+<a id="top"></a>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> Seismological Research Letters · Regular Article</div>
+    <h1>Observation-Driven Second-by-Second Seismic-Intensity Forecasting</h1>
+    <p class="subtitle">A low-false-alarm complement to source-parameter earthquake early warning in Taiwan.</p>
+    <div class="authors"><strong>Da-Yi Chen</strong><sup>1,*</sup> &nbsp;&amp;&nbsp; <strong>Yu-Hsuan Chang</strong><sup>1</sup></div>
+    <div class="affil">¹ Central Weather Administration, Taipei, Taiwan · Corresponding author: Da-Yi Chen</div>
+    <div class="chips">
+      <span class="chip">Earthquake early warning</span>
+      <span class="chip">Seismic intensity</span>
+      <span class="chip">Transformer</span>
+      <span class="chip">PLUM</span>
+      <span class="chip">eBEAR</span>
+      <span class="chip">Taiwan</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="card abstract">
+      <div class="label">Abstract</div>
+      <p>
+        Earthquake early warning (EEW) systems commonly estimate origin time, hypocenter, and magnitude before converting
+        those source parameters into expected shaking — an architecture that provides rapid regional coverage, but whose
+        errors in early association, location, magnitude, or rupture representation can propagate into alert decisions.
+        We evaluate an observation-driven complement that forecasts final station-level seismic intensity directly from
+        incomplete one-second intensity sequences. The <strong>Second-by-second Intensity Transformer Forecaster (SITF)</strong>
+        uses no hypocenter, magnitude, source model, or ground-motion prediction equation as model input. Trained on 198
+        Taiwan earthquakes and evaluated on 161 nonoverlapping earthquakes (97,354 station-event samples per early window),
+        SITF achieved <strong>91.5% precision</strong> at 20&nbsp;s with a <strong>0.38% false-alarm rate</strong> at the
+        national public-warning threshold of intensity&nbsp;≥&nbsp;4, and <strong>96.4% precision</strong>,
+        <strong>82.5% probability of detection</strong>, and an <strong>F1 of 0.889</strong> at 40&nbsp;s. SITF is best
+        interpreted as a low-false-alarm, observation-driven confirmation layer that complements — rather than replaces —
+        conventional source-parameter EEW and direct observation-propagation methods.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="tiles">
+      <div class="tile">
+        <div class="t-label">Independent evaluation</div>
+        <div class="t-value">161<span class="unit">events</span></div>
+        <div class="t-delta">of 198 training + 208 original eval, deduplicated</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Station-event samples</div>
+        <div class="t-value">97,354<span class="unit">/ window</span></div>
+        <div class="t-delta">across 639 stations network-wide</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Precision at I≥4, EW40</div>
+        <div class="t-value">96.4<span class="unit">%</span></div>
+        <div class="t-delta good">▲ from 91.5% at EW20</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Detection (POD) at I≥4, EW40</div>
+        <div class="t-value">82.5<span class="unit">%</span></div>
+        <div class="t-delta good">▲ from 49.5% at EW20</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">False-alarm rate, EW40</div>
+        <div class="t-value">0.26<span class="unit">%</span></div>
+        <div class="t-delta">vs. 13.87% for PLUM-R30</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="results">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Overall forecast accuracy</div>
+      <h2>Skill improves as more of the sequence arrives</h2>
+      <p class="lede">Across the 161-event independent evaluation, both classification and regression accuracy improve
+        steadily from the 5&#8209;second window (EW05) to the 40&#8209;second window (EW40).</p>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <div class="t-label">Exact class accuracy</div>
+        <div class="t-value">79.4<span class="unit">%</span></div>
+        <div class="t-delta good">▲ from 56.4% at EW05</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Off-by-one accuracy</div>
+        <div class="t-value">98.2<span class="unit">%</span></div>
+        <div class="t-delta good">▲ from 83.8% at EW05</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Regression MAE</div>
+        <div class="t-value">0.261</div>
+        <div class="t-delta good">▼ from 0.755 at EW05</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">Regression RMSE</div>
+        <div class="t-value">0.521</div>
+        <div class="t-delta good">▼ from 1.095 at EW05</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">National public-warning threshold, I ≥ 4</div>
+      <h2>A non-monotonic path to a high-precision regime</h2>
+      <p class="lede">Threshold discrimination is strongly window-dependent: precision dips near EW15 before recovering
+        sharply by EW20 and stabilizing above 96% by EW30–EW40, while the false-alarm rate mirrors the same trough.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card chart-card">
+        <h3>SITF precision at I ≥ 4</h3>
+        <div class="chart-sub">EW15 → EW40, percent of positive calls that were correct</div>
+        <svg class="chart" id="chart-precision-trend" viewBox="0 0 420 220" role="img" aria-label="Precision rises from 51.2% at EW15 to 96.4% at EW40"></svg>
+      </div>
+      <div class="card chart-card">
+        <h3>SITF false-alarm rate at I ≥ 4</h3>
+        <div class="chart-sub">EW15 → EW40, percent of negatives incorrectly flagged</div>
+        <svg class="chart" id="chart-far-trend" viewBox="0 0 420 220" role="img" aria-label="False-alarm rate falls from 2.15% at EW15 to under 0.4% by EW20 and beyond"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="compare">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Comparison with direct-observation baselines</div>
+      <h2>Different methods, different operating points</h2>
+      <p class="lede">SITF sits between conservative target-station persistence and an aggressive propagation-only
+        PLUM-like baseline — it detects more than persistence while keeping false alarms far below PLUM.</p>
+    </div>
+    <div class="legend-row" id="method-legend">
+      <span class="key"><span class="swatch" style="background:var(--series-sitf)"></span>SITF</span>
+      <span class="key"><span class="swatch" style="background:var(--series-persistence)"></span>Persistence-cummax</span>
+      <span class="key"><span class="swatch" style="background:var(--series-plum)"></span>PLUM-R30, exclude target</span>
+    </div>
+    <div class="grid-2">
+      <div class="card chart-card">
+        <h3>Precision at I ≥ 4</h3>
+        <div class="chart-sub">by early window, three methods</div>
+        <svg class="chart" id="chart-precision-method" viewBox="0 0 460 260" role="img" aria-label="Grouped bar chart of precision by method across EW20, EW30 and EW40"></svg>
+      </div>
+      <div class="card chart-card">
+        <h3>Detection (POD) at I ≥ 4</h3>
+        <div class="chart-sub">by early window, three methods</div>
+        <svg class="chart" id="chart-pod-method" viewBox="0 0 460 260" role="img" aria-label="Grouped bar chart of probability of detection by method across EW20, EW30 and EW40"></svg>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="table-scroll">
+        <table>
+          <caption style="caption-side:top; text-align:left; font-size:12.5px; color:var(--text-muted); margin-bottom:10px;">
+            Table view — full source data for the charts above (Table 2 of the manuscript)
+          </caption>
+          <thead>
+            <tr><th>Method</th><th>Window</th><th>Precision</th><th>POD / Recall</th><th>F1</th><th>FAR</th></tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Complementarity with eBEAR</div>
+      <h2>Different failure modes, one union</h2>
+      <p class="lede">In a 160-event matched sensitivity analysis, an event-level SITF rule (EW20 or later) recovers
+        every eBEAR miss while adding only one false positive.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <div class="t-label">eBEAR precision / POD / F1</div>
+        <div class="t-value" style="font-size:22px;">98.4% / 80.8% / 0.887</div>
+        <div class="t-delta">126 TP · 2 FP · 30 FN · 2 TN</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">SITF event-level detection</div>
+        <div class="t-value">156<span class="unit">/ 156</span></div>
+        <div class="t-delta">alert-positive events identified, 1 false positive</div>
+      </div>
+      <div class="tile">
+        <div class="t-label">eBEAR ∪ SITF precision</div>
+        <div class="t-value">98.1<span class="unit">%</span></div>
+        <div class="t-delta good">recovers all 30 eBEAR misses</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="method">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">A layered warning architecture</div>
+      <h2>Three pathways, three different jobs</h2>
+      <p class="lede">The scientific claim is not that SITF dominates — it occupies a distinct, low-false-alarm
+        operating point that complements the other two pathways.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card pathway" style="--card-accent: var(--series-ebear);">
+        <div class="p-eyebrow">Source parameters</div>
+        <h3>eBEAR</h3>
+        <p>Taiwan's operational Earthworm-based system: waveform acquisition, P-wave picking, association, rapid
+          source estimation, and dissemination. Fastest broad-area alert, but exposed to early-solution error.</p>
+      </div>
+      <div class="card pathway" style="--card-accent: var(--series-plum);">
+        <div class="p-eyebrow">Observation propagation</div>
+        <h3>PLUM-like</h3>
+        <p>Estimates shaking at a target from strong motion already observed at neighboring stations. Robust to
+          source-model error; favors high detection at the cost of more false alarms (FAR 9.8–13.9%).</p>
+      </div>
+      <div class="card pathway" style="--card-accent: var(--series-sitf);">
+        <div class="p-eyebrow">Observation forecasting</div>
+        <h3>SITF (this work)</h3>
+        <p>Forecasts a station's own eventual intensity from its incomplete one-second sequence — no source model.
+          Favors reliable, station-specific confirmation with FAR consistently below 0.4%.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Model architecture &amp; training</div>
+      <h2>A compact temporal Transformer</h2>
+      <p class="lede">A temporal convolutional embedding feeds a Transformer encoder; pooled encoded frames drive a
+        10-class ordered-intensity head and a continuous-intensity regression head.</p>
+    </div>
+    <div class="card">
+      <div class="spec-grid">
+        <div><div class="s-label">Hidden size</div><div class="s-value">192</div></div>
+        <div><div class="s-label">Encoder layers</div><div class="s-value">4</div></div>
+        <div><div class="s-label">Attention heads</div><div class="s-value">4</div></div>
+        <div><div class="s-label">Intermediate size</div><div class="s-value">384</div></div>
+        <div><div class="s-label">Dropout</div><div class="s-value">0.1</div></div>
+        <div><div class="s-label">Optimizer</div><div class="s-value">AdamW</div></div>
+        <div><div class="s-label">Learning rate</div><div class="s-value">3×10⁻⁴</div></div>
+        <div><div class="s-label">Batch size</div><div class="s-value">16</div></div>
+        <div><div class="s-label">Epochs</div><div class="s-value">30</div></div>
+        <div><div class="s-label">Seed</div><div class="s-value">42</div></div>
+      </div>
+      <div class="formula">L = 0.3 · L_CE&nbsp; (ordered-class cross-entropy) &nbsp;+&nbsp; 0.7 · L_SmoothL1&nbsp; (continuous-intensity regression)</div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="limitations">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Limitations</div>
+      <h2>What this result does not yet show</h2>
+    </div>
+    <div class="card">
+      <ol class="limits">
+        <li><span class="n">1</span> The target is final peak intensity, not a fixed future horizon (t+h); a production model for t+1/t+3/t+5/t+10s remains future work.</li>
+        <li><span class="n">2</span> The analysis is retrospective and origin-time referenced — true public lead time and dissemination latency are not measured.</li>
+        <li><span class="n">3</span> Strong-intensity samples are sparse, and class imbalance can make station-level reliability unstable.</li>
+        <li><span class="n">4</span> The model is station-local and does not yet exploit the spatial coherence of a dense network.</li>
+        <li><span class="n">5</span> The eBEAR comparison is event-level sensitivity, not a matched station-level benchmark.</li>
+        <li><span class="n">6</span> The 2024 Hualien earthquake is not yet quantified in the independent test set and should be treated as illustrative only.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <span>© Da-Yi Chen &amp; Yu-Hsuan Chang · Central Weather Administration, Taiwan · Licensed under Apache&nbsp;2.0</span>
+      <span>
+        <a href="https://github.com/oceanicdayi/Srl_seismic_intensity/blob/main/SRL_manuscript_observation_driven_second_by_second_intensity.md" target="_blank" rel="noopener">Full manuscript</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/oceanicdayi/Transformer_seismic_intensity" target="_blank" rel="noopener">Model code</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/oceanicdayi/Srl_seismic_intensity" target="_blank" rel="noopener">This repository</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<div id="tooltip" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- theme toggle ---------------- */
+  var root = document.documentElement;
+  var stored = localStorage.getItem("sitf-theme");
+  if (stored) root.setAttribute("data-theme", stored);
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var current = root.getAttribute("data-theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    localStorage.setItem("sitf-theme", next);
+  });
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    var e = document.createElementNS(SVGNS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function cssVar(name) {
+    return getComputedStyle(document.body).getPropertyValue(name).trim();
+  }
+
+  var tooltip = document.getElementById("tooltip");
+  function showTooltip(evt, rows) {
+    tooltip.innerHTML = "";
+    rows.forEach(function (r, i) {
+      var row = document.createElement("div");
+      if (i === 0) { row.className = "tt-title"; row.textContent = r.text; }
+      else {
+        row.className = "tt-row";
+        if (r.color) {
+          var key = document.createElement("span");
+          key.className = "tt-key"; key.style.background = r.color;
+          row.appendChild(key);
+        }
+        var span = document.createElement("span");
+        span.textContent = r.text;
+        row.appendChild(span);
+      }
+      tooltip.appendChild(row);
+    });
+    tooltip.style.left = evt.clientX + "px";
+    tooltip.style.top = evt.clientY + "px";
+    tooltip.classList.add("show");
+  }
+  function hideTooltip() { tooltip.classList.remove("show"); }
+
+  /* ================= line trend charts ================= */
+  function renderLineChart(svgId, points, opts) {
+    var svg = document.getElementById(svgId);
+    var W = 420, H = 220, padL = 34, padR = 16, padT = 16, padB = 30;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var yMax = opts.yMax, yTicks = opts.yTicks, unit = opts.unit || "%";
+    var color = cssVar(opts.colorVar);
+
+    function xAt(i) { return padL + (i / (points.length - 1)) * plotW; }
+    function yAt(v) { return padT + plotH - (v / yMax) * plotH; }
+
+    // gridlines + y labels
+    yTicks.forEach(function (t) {
+      var y = yAt(t);
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y, y2: y, class: "gridline" }));
+      var label = el("text", { x: padL - 8, y: y + 3, class: "axis-label", "text-anchor": "end" });
+      label.textContent = t;
+      svg.appendChild(label);
+    });
+    // baseline
+    svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: yAt(0), y2: yAt(0), class: "baseline" }));
+
+    // area wash
+    var areaPts = points.map(function (p, i) { return xAt(i) + "," + yAt(p.v); }).join(" ");
+    var areaPath = "M" + xAt(0) + "," + yAt(0) + " L" + areaPts + " L" + xAt(points.length - 1) + "," + yAt(0) + " Z";
+    svg.appendChild(el("path", { d: areaPath, fill: color, "fill-opacity": "0.10", stroke: "none" }));
+
+    // line
+    var linePts = points.map(function (p, i) { return xAt(i) + "," + yAt(p.v); }).join(" ");
+    svg.appendChild(el("polyline", { points: linePts, fill: "none", stroke: color, "stroke-width": "2", "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+    points.forEach(function (p, i) {
+      var cx = xAt(i), cy = yAt(p.v);
+      // surface ring
+      svg.appendChild(el("circle", { cx: cx, cy: cy, r: 6, fill: cssVar("--surface-1") }));
+      var dot = el("circle", { cx: cx, cy: cy, r: 4.5, fill: color, class: "dot-mark" });
+      svg.appendChild(dot);
+      // transparent larger hit target
+      var hit = el("circle", { cx: cx, cy: cy, r: 14, fill: "transparent", class: "dot-mark" });
+      hit.addEventListener("pointermove", function (evt) {
+        showTooltip(evt, [{ text: p.label }, { text: p.v + unit, color: color }]);
+      });
+      hit.addEventListener("pointerleave", hideTooltip);
+      svg.appendChild(hit);
+
+      // x label
+      var xl = el("text", { x: cx, y: H - 8, class: "axis-label", "text-anchor": "middle" });
+      xl.textContent = p.label;
+      svg.appendChild(xl);
+
+      // endpoint value label
+      if (opts.labelEnds && (i === 0 || i === points.length - 1)) {
+        var vl = el("text", { x: cx, y: cy - 12, class: "value-label", "text-anchor": "middle" });
+        vl.textContent = p.v + unit;
+        svg.appendChild(vl);
+      }
+    });
+  }
+
+  renderLineChart("chart-precision-trend", [
+    { label: "EW15", v: 51.2 },
+    { label: "EW20", v: 91.5 },
+    { label: "EW30", v: 96.15 },
+    { label: "EW40", v: 96.39 }
+  ], { yMax: 100, yTicks: [0, 25, 50, 75, 100], colorVar: "--series-sitf", labelEnds: true });
+
+  renderLineChart("chart-far-trend", [
+    { label: "EW15", v: 2.15 },
+    { label: "EW20", v: 0.38 },
+    { label: "EW30", v: 0.20 },
+    { label: "EW40", v: 0.26 }
+  ], { yMax: 2.5, yTicks: [0, 1.25, 2.5], colorVar: "--series-plum", labelEnds: true });
+
+  /* ================= grouped bar charts ================= */
+  function renderGroupedBar(svgId, groups, series, yMax, unit) {
+    var svg = document.getElementById(svgId);
+    var W = 460, H = 260, padL = 30, padR = 10, padT = 16, padB = 32;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var groupW = plotW / groups.length;
+    var barW = 20, gap = 3;
+    var seriesTotalW = series.length * barW + (series.length - 1) * gap;
+    var yTicks = [0, yMax / 2, yMax];
+
+    yTicks.forEach(function (t) {
+      var y = padT + plotH - (t / yMax) * plotH;
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y, y2: y, class: "gridline" }));
+      var label = el("text", { x: padL - 6, y: y + 3, class: "axis-label", "text-anchor": "end" });
+      label.textContent = Math.round(t);
+      svg.appendChild(label);
+    });
+    var y0 = padT + plotH;
+    svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y0, y2: y0, class: "baseline" }));
+
+    groups.forEach(function (g, gi) {
+      var groupLeft = padL + gi * groupW;
+      var startX = groupLeft + (groupW - seriesTotalW) / 2;
+      series.forEach(function (s, si) {
+        var v = g.values[si];
+        var barH = (v / yMax) * plotH;
+        var x = startX + si * (barW + gap);
+        var y = y0 - barH;
+        var rect = el("rect", { x: x, y: y, width: barW, height: Math.max(barH, 1.5), rx: 3, ry: 3, fill: s.color, class: "bar-mark" });
+        svg.appendChild(rect);
+        rect.addEventListener("pointermove", function (evt) {
+          showTooltip(evt, [{ text: g.label }, { text: s.name + ": " + v + unit, color: s.color }]);
+        });
+        rect.addEventListener("pointerleave", hideTooltip);
+      });
+      var xl = el("text", { x: groupLeft + groupW / 2, y: H - 10, class: "cat-label", "text-anchor": "middle" });
+      xl.textContent = g.label;
+      svg.appendChild(xl);
+    });
+  }
+
+  var methodSeries = [
+    { name: "SITF", color: cssVar("--series-sitf") },
+    { name: "Persistence-cummax", color: cssVar("--series-persistence") },
+    { name: "PLUM-R30, exclude target", color: cssVar("--series-plum") }
+  ];
+
+  renderGroupedBar("chart-precision-method", [
+    { label: "EW20", values: [91.50, 100.00, 35.71] },
+    { label: "EW30", values: [96.15, 100.00, 35.55] },
+    { label: "EW40", values: [96.39, 100.00, 35.23] }
+  ], methodSeries, 100, "%");
+
+  renderGroupedBar("chart-pod-method", [
+    { label: "EW20", values: [49.48, 47.39, 65.90] },
+    { label: "EW30", values: [59.52, 62.67, 80.53] },
+    { label: "EW40", values: [82.52, 80.32, 91.12] }
+  ], methodSeries, 100, "%");
+
+  /* ================= table view (accessible alternative) ================= */
+  var tableRows = [
+    ["SITF", "EW20", "91.50%", "49.48%", "0.642", "0.38%"],
+    ["Persistence-cummax", "EW20", "100.00%", "47.39%", "0.643", "0.00%"],
+    ["PLUM-R30, exclude target", "EW20", "35.71%", "65.90%", "0.463", "9.84%"],
+    ["SITF", "EW30", "96.15%", "59.52%", "0.735", "0.20%"],
+    ["Persistence-cummax", "EW30", "100.00%", "62.67%", "0.770", "0.00%"],
+    ["PLUM-R30, exclude target", "EW30", "35.55%", "80.53%", "0.493", "12.10%"],
+    ["SITF", "EW40", "96.39%", "82.52%", "0.889", "0.26%"],
+    ["Persistence-cummax", "EW40", "100.00%", "80.32%", "0.891", "0.00%"],
+    ["PLUM-R30, exclude target", "EW40", "35.23%", "91.12%", "0.508", "13.87%"]
+  ];
+  var colorMap = {
+    "SITF": cssVar("--series-sitf"),
+    "Persistence-cummax": cssVar("--series-persistence"),
+    "PLUM-R30, exclude target": cssVar("--series-plum")
+  };
+  var tbody = document.getElementById("table-body");
+  tableRows.forEach(function (row) {
+    var tr = document.createElement("tr");
+    row.forEach(function (val, ci) {
+      var td = document.createElement("td");
+      if (ci === 0) {
+        td.className = "method-key";
+        var k = document.createElement("span");
+        k.className = "k";
+        k.style.background = colorMap[val];
+        td.appendChild(k);
+        var span = document.createElement("span");
+        span.textContent = val;
+        td.appendChild(span);
+      } else {
+        td.textContent = val;
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
