@@ -306,6 +306,7 @@
       <a href="#ebear">eBEAR</a>
       <a href="#method">Method</a>
       <a href="#limitations">Limitations</a>
+      <a href="#stratification">Evaluation design</a>
       <a href="https://github.com/oceanicdayi/Srl_seismic_intensity" target="_blank" rel="noopener">Manuscript</a>
       <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
     </div>
@@ -584,6 +585,139 @@
         <li><span class="n">6</span> The 2024 Hualien earthquake is not yet quantified in the independent test set and should be treated as illustrative only.</li>
       </ol>
     </div>
+  </div>
+</section>
+
+<section class="divider" id="stratification">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Proposed refinement to the evaluation design</div>
+      <h2><a class="anchor-link" href="#stratification" aria-label="Link to this section">#</a>An early window is a time coordinate, not an information coordinate</h2>
+      <p class="lede">EW05–EW40 fix elapsed time since origin, not the amount of seismic information a station has actually
+        received. A near-source and a far-source station both labeled "EW20" can carry very different evidence, and
+        pooling them risks conflating genuine anticipatory skill with the physics of wave travel time. This section
+        outlines a phase-conditioned analysis planned as a layer on top of the pooled EW05–EW40 results above — it
+        extends Limitation&nbsp;2 (origin-time referencing) into a full audit and has not yet been computed.</p>
+    </div>
+
+    <div class="card">
+      <p style="color:var(--text-secondary); font-size:14px; margin:0 0 4px;">
+        Decision time is currently defined purely by elapsed time from origin:</p>
+      <div class="formula">T_decision = T_origin + EW &nbsp;(e.g., EW20 → T_decision = T_origin + 20 s)</div>
+      <p style="color:var(--text-secondary); font-size:14px; margin:16px 0 0;">
+        But at that shared T_decision, three stations at different distances can be in three different wave-arrival
+        states:</p>
+      <div class="table-scroll" style="margin-top:14px;">
+        <table>
+          <thead><tr><th>Station</th><th>Distance</th><th>Likely phase content at EW20</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>~20&nbsp;km</td><td>P and S waves, much of the strong motion already recorded</td></tr>
+            <tr><td>B</td><td>~80&nbsp;km</td><td>S-wave strong motion just beginning</td></tr>
+            <tr><td>C</td><td>~180&nbsp;km</td><td>P wave only; the main shaking has not yet arrived</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="card">
+        <h3>Two phase-relative timing variables</h3>
+        <p style="font-size:14px; color:var(--text-secondary);">For every station-event-window record, decision time
+          would be re-expressed relative to that station's own P- and S-wave arrival, not just relative to origin time:</p>
+        <div class="formula">τ_P = T_decision − T_P</div>
+        <div class="formula" style="margin-top:8px;">τ_S = T_decision − T_S</div>
+        <p style="margin-top:12px; font-size:14px; color:var(--text-secondary);">τ_P &lt; 0 means the P wave has not
+          yet reached the station at decision time; τ_P ≥ 0 with τ_S &lt; 0 is the window between P and S arrival —
+          the regime closest to genuine single-station EEW.</p>
+      </div>
+      <div class="card">
+        <h3>Why pooling by EW alone can mislead</h3>
+        <ul style="margin:0; padding-left:18px; color:var(--text-secondary); font-size:14px; display:grid; gap:8px;">
+          <li>Near-source stations that already show strong shaking can inflate EW20 recall — closer to confirmation
+            than anticipation.</li>
+          <li>Distant stations with no signal yet cannot be judged on the same footing; a miss there reflects
+            unavailable information, not model failure.</li>
+          <li>A sample dominated by low-intensity, far-field station-events can inflate pooled accuracy while
+            near-source, high-intensity stations that matter operationally still show misses.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h3>Proposed wave-phase stratification matrix</h3>
+      <p class="chart-sub" style="margin-bottom:14px;">Each EW checkpoint would be re-reported within these five
+        phase categories rather than as a single pooled figure.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Phase category</th><th>Definition</th><th>Scientific meaning</th></tr></thead>
+          <tbody>
+            <tr><td>Pre-P</td><td>τ_P &lt; 0</td><td>Station has no earthquake information yet</td></tr>
+            <tr><td>P-only</td><td>τ_P ≥ 0, τ_S &lt; 0</td><td>Earliest true single-station EEW regime</td></tr>
+            <tr><td>Post-S, pre-threshold</td><td>τ_S ≥ 0, intensity &lt; 4</td><td>Strong motion under way, warning not yet triggered</td></tr>
+            <tr><td>Post-threshold</td><td>intensity ≥ 4 at decision time</td><td>Confirmation, not anticipatory forecasting</td></tr>
+            <tr><td>Invalid</td><td>missing or unresolved phase picks</td><td>Excluded from the skill evaluation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="card">
+        <h3>A four-way split of the anticipatory subset</h3>
+        <p style="font-size:14px; color:var(--text-secondary);">Anticipatory samples — currently defined only as
+          "final intensity ≥&nbsp;4 and not yet crossed at decision time" — would be further separated into:</p>
+        <ol class="limits" style="margin-top:12px;">
+          <li><span class="n">A</span> No-arrival — P wave not yet at the station; a miss here is a data-availability limit, not a model failure.</li>
+          <li><span class="n">B</span> P-wave anticipatory — P has arrived, S has not; the strictest test of single-station forecasting skill.</li>
+          <li><span class="n">C</span> Pre-threshold strong motion — S has arrived but intensity 4 not yet reached; a shorter but still operationally useful lead time.</li>
+          <li><span class="n">D</span> Confirmation — intensity 4 already reached at decision time; excluded from anticipatory-skill claims.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Two-layer reporting</h3>
+        <p style="font-size:14px; color:var(--text-secondary); margin:0;"><strong style="color:var(--text-primary);">Layer 1 — operationally distributed:</strong>
+          the pooled EW05–EW40 metrics already reported above, reflecting SITF's performance under the real event and
+          station mix.</p>
+        <p style="margin-top:10px; font-size:14px; color:var(--text-secondary);"><strong style="color:var(--text-primary);">Layer 2 — information-conditioned:</strong>
+          the same metrics recomputed within distance bins, phase categories, and the anticipatory A–D split, reported
+          as both a micro-average (station-event pooled) and an event-macro average (event-then-averaged), with
+          event-cluster bootstrap confidence intervals so that events with hundreds of stations do not dominate events
+          with few.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h3>Planned figures</h3>
+      <ul style="margin:0; padding-left:18px; color:var(--text-secondary); font-size:14px; display:grid; gap:10px;">
+        <li><strong style="color:var(--text-primary);">EW × distance heatmap</strong> — recall, precision,
+          anticipatory recall, and median lead time across EW05–EW40 and distance bins, to show which distance bands
+          gain skill first as the window lengthens.</li>
+        <li><strong style="color:var(--text-primary);">Performance vs. τ_S</strong> — recall and precision plotted
+          against time relative to S-wave arrival rather than origin time, to test directly whether SITF shows skill
+          before S-wave arrival or only after.</li>
+        <li><strong style="color:var(--text-primary);">Distance–window–skill surface</strong> — anticipatory recall
+          or lead time as a function of early window and source distance, replacing a single pooled number with the
+          model's actual region of usefulness.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="margin-top:20px; background: color-mix(in srgb, var(--surface-1) 92%, var(--series-sitf));">
+      <p style="margin:0; font-size:14px; color:var(--text-secondary);">
+        <strong style="color:var(--text-primary);">Reframed claim.</strong> Rather than "SITF performance improves as
+        the early window increases," a phase-conditioned analysis would let the paper state that SITF's skill depends
+        jointly on the origin-referenced window <em>and</em> on how much seismic information has actually reached
+        each station — and would let it answer directly whether SITF shows skill before S-wave arrival, which
+        distance ranges show positive lead time, and how much of EW20's apparent recall comes from near-source
+        stations that had already seen strong shaking.
+      </p>
+    </div>
+
+    <p class="lede" style="margin-top:20px;">This stratification is not yet computed in the results reported above.
+      It would require adding, to every station-event-window record: hypocentral and epicentral distance, estimated
+      T_P and T_S, τ_P, τ_S, maximum observed intensity at decision time, a threshold-crossed-before-decision flag,
+      the phase category above, and the A–D anticipatory/confirmation category — then reporting pooled,
+      distance-conditioned, phase-conditioned, anticipatory, and positive-lead-time performance as five explicit
+      results tiers.</p>
   </div>
 </section>
 
